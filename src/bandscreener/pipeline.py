@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 import pandas as pd
 
 from .config import Config
+from .indicators import quarterly_rsi
 from .signals import evaluate, evaluate_upper
 
 ROUND_DIGITS = 5
@@ -42,6 +43,9 @@ def _params_block(cfg: Config, signal) -> dict:
         "liq_window": cfg.liq_window,
         "liq_min_us": cfg.liq_min_us,
         "liq_min_au": cfg.liq_min_au,
+        "rsi_period": cfg.rsi_period,
+        "rsi_oversold": cfg.rsi_oversold,
+        "rsi_overbought": cfg.rsi_overbought,
     }
 
 
@@ -79,6 +83,10 @@ def build_payload(
         adv = result.get("adv")
         row["low_liquidity"] = bool(adv is not None and adv < min_adv)
         row["is_etf"] = (stock["market"], stock["ticker"]) in (etfs or set())
+        if result.get("status") == "ok":
+            row["rsi"] = quarterly_rsi(
+                prices.get(stock["yahoo"]), as_of, include_current=(signal.band_mode == "live"), period=cfg.rsi_period
+            )
         rows.append(_clean(row))
 
     loaded = sum(1 for s in universe if s["yahoo"] in prices)

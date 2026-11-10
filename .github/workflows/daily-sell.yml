@@ -7,6 +7,8 @@ on:
   push:
     paths:
       - data/holdings.txt # edit the list on GitHub and the Sell tab refreshes within minutes
+      - data/targets.txt  # target buy / sell prices and per-tab hiding, shown on both tabs
+      - data/etfs.txt     # which tickers are tagged ETF
   workflow_dispatch: # run it by hand from the Actions tab (works from a phone)
 
 permissions:

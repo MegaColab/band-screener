@@ -31,13 +31,20 @@ The Sell tab is the mirror image of Buy: `gap = (highest daily high in the windo
 
 Lines starting with `#` are comments. Entries that cannot be read (for example a London listing) are shown as a warning on the Sell tab instead of being dropped silently.
 
-**Public repo warning:** the repository and the dashboard are public, so the tickers in `data/holdings.txt` are visible to anyone. Keep to tickers only. Never add quantities, prices, account names or notes about positions. If the tickers alone are too revealing, rename the tab in the page template (for example to "Watchlist") or make the repository private (Pages then needs a paid plan).
+**Public repo warning:** the repository and the dashboard are public, so the tickers in `data/holdings.txt` are visible to anyone. Keep to tickers only. Never add quantities, account names or notes about positions. (Target prices go only in `data/targets.txt`, see below, and are public too.) If the tickers alone are too revealing, rename the tab in the page template (for example to "Watchlist") or make the repository private (Pages then needs a paid plan).
 
 ## Filters and tags on both tabs
 
 - **Show all (ignore threshold):** lists every stock with a band, sorted by how close it is to the band, with an "outside zone" tag on those beyond the threshold. Use it to see which stocks are approaching the zone.
 - **New tag and "New only":** a stock gets a "new" tag when it is in the zone now but was not in the previous run's list. Each window (week, quarter-to-date) is compared on its own. The comparison uses the files in `docs/data/history/`, so the first run after a fresh start tags nothing. The "New only" box appears once a previous run exists.
 - **Type filter (All / Stocks only / ETFs only):** driven by `data/etfs.txt`, a list of tickers in the same format as `data/holdings.txt`. Those stocks get an "ETF" tag. The Type box appears on a tab only when at least one stock on it is listed there. The Buy universe (S&P 500 and ASX 200 members) holds no ETFs, so the box normally shows on the Sell tab only.
+
+## Targets, hiding and RSI (both tabs)
+
+- **Target buy / target sell:** type them into `data/targets.txt`, one stock per line, for example `ASX:BHP buy=40.5 sell=55`. Prices are in the stock's own currency. Each tab shows the price and the move still needed from the last close (`target ÷ close − 1`: a buy target below the price shows a negative number, a sell target above it a positive one). When the close is at or beyond a target the row shows "at buy target" or "at sell target". The page has an "Edit targets / hide" link that opens the file in GitHub's editor; saving it rebuilds the page within a few minutes. Because the file lives in the repository, targets are the same on your phone and laptop.
+- **Hide per tab:** add `hide=buy`, `hide=sell` or `hide=buy,sell` to a stock's line. It is hidden only on the tab(s) named. A "Show hidden (n)" box appears when hidden stocks match the current filters.
+- **RSI (qtr):** Wilder RSI(14) of the same quarterly closes the bands use, including the unfinished quarter by default. At or below 30 is tagged "RSI oversold", at or above 70 "RSI overbought" (change in the `[rsi]` section of `config.toml`). The RSI filter shows only oversold or only overbought stocks, and the column sorts. Because Wilder smoothing remembers a long history, and the repo downloads 6 years (about 24 quarters), the value can differ by a few points from a chart that starts decades back.
+- **Phone layout:** on a narrow screen each stock shows as a card, empty target fields are left out, and a Sort box replaces the clickable column headings.
 
 ## One-time setup
 
@@ -80,6 +87,9 @@ The current file is **approximate**: it was built from a third-party snapshot pa
 | `tests/` | Automated tests, run before every weekly screen |
 | `data/holdings.txt` | Your tickers for the Sell tab (you edit this) |
 | `data/etfs.txt` | Tickers to tag as ETFs, for the Type filter (you edit this; tickers only) |
+| `data/targets.txt` | Your target buy / sell prices and per-tab hide flags (you edit this; public) |
+| `src/bandscreener/indicators.py` | RSI on the quarterly closes. Pure functions, fully tested |
+| `src/bandscreener/targets.py` | Reads `data/targets.txt` |
 | `.github/workflows/` | `weekly.yml` (Buy) and `daily-sell.yml` (Sell) |
 | `docs/` | Published dashboard and data (written by the workflows) |
 
@@ -98,7 +108,7 @@ PYTHONPATH=src python -m bandscreener sell           # real Sell run (reads data
 
 ## Privacy
 
-This is a public repository. It contains no personal data: index lists, code, settings, screening results, and the ticker symbols you choose to list in `data/holdings.txt`. No quantities, prices or accounts belong here. A test (`tests/test_privacy.py`) fails if an email address appears in any file.
+This is a public repository. It contains no personal data: index lists, code, settings, screening results, the ticker symbols you choose to list in `data/holdings.txt` and `data/etfs.txt`, and the target buy and sell prices (and hide flags) you choose to publish in `data/targets.txt`. The owner has chosen to make those targets public. No quantities, account names or notes about positions belong here. A test (`tests/test_privacy.py`) fails if an email address appears in any file.
 
 ## Limits to know about
 

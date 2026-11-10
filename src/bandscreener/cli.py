@@ -13,7 +13,12 @@ from pathlib import Path
 from .config import load_config
 from .pipeline import build_empty_payload, build_payload, mark_new
 from .report import read_previous_snapshot, write_outputs
+from .targets import load_targets
 from .universe import load_etfs
+
+
+def _targets(cfg) -> dict:
+    return load_targets(cfg.targets_file, cfg.targets_edit_url)
 
 
 def _finish(cfg, args, universe, prices, warnings, asx_meta, side: str, out_dir: Path) -> int:
@@ -28,7 +33,7 @@ def _finish(cfg, args, universe, prices, warnings, asx_meta, side: str, out_dir:
 
     payload = build_payload(cfg, universe, prices, warnings, asx_meta, side=side, etfs=load_etfs(cfg.etf_file))
     mark_new(payload, read_previous_snapshot(out_dir, side, payload["as_of"]))
-    written = write_outputs(payload, out_dir, cfg.keep_history)
+    written = write_outputs(payload, out_dir, cfg.keep_history, targets=_targets(cfg))
 
     counts = payload["counts"]
     print(f"Prices to {payload['as_of']}. Loaded {counts['loaded']} of {counts['universe']}.", file=sys.stderr)
@@ -79,7 +84,7 @@ def run_sell(args: argparse.Namespace) -> int:
         out_dir = Path(args.out) if args.out else cfg.out_dir
         if not universe:
             payload = build_empty_payload(cfg, "upper", warnings)
-            write_outputs(payload, out_dir, cfg.keep_history)
+            write_outputs(payload, out_dir, cfg.keep_history, targets=_targets(cfg))
             print("No holdings listed yet; wrote an empty Sell tab.", file=sys.stderr)
             return 0
         print(f"Holdings: {len(universe)} stocks", file=sys.stderr)

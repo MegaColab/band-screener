@@ -19,7 +19,15 @@
         </label>
         <label><input data-role="liq" type="checkbox"> Hide low-liquidity</label>
         <label data-role="newwrap" hidden><input data-role="newonly" type="checkbox"> New only</label>
+        <label data-role="rsiwrap" hidden>RSI
+          <select data-role="rsif"><option value="ALL">All</option><option value="OS">Oversold</option><option value="OB">Overbought</option></select>
+        </label>
         <label><input data-role="all" type="checkbox"> Show all (ignore threshold)</label>
+        <label data-role="hiddenwrap" hidden><input data-role="showhidden" type="checkbox"> <span data-role="hiddenlabel">Show hidden</span></label>
+        <label class="phone-only">Sort
+          <select data-role="sortsel"><option value="gap">Gap to band</option><option value="stock">Stock</option><option value="close">Close vs band</option><option value="rsi">RSI</option></select>
+        </label>
+        <a data-role="editlink" class="editlink" target="_blank" rel="noopener" hidden>Edit targets / hide</a>
       </div>
     </div>
 
@@ -34,6 +42,9 @@
               <th data-role="edgehead">Low</th>
               <th data-role="bandhead">Band</th>
               <th data-sort="close">Close</th>
+              <th data-sort="rsi">RSI (qtr)</th>
+              <th>Target buy</th>
+              <th>Target sell</th>
             </tr>
           </thead>
           <tbody data-role="tbody"></tbody>
@@ -71,7 +82,7 @@
 [hidden] { display: none !important; }
 body { margin: 0; background: var(--bg); color: var(--ink);
   font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-.wrap { max-width: 980px; margin: 0 auto; padding: 20px 16px 48px; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 20px 16px 48px; }
 h1 { font-size: 1.4rem; margin: 0 0 2px; }
 .sub, .asof { margin: 0; color: var(--muted); font-size: .88rem; }
 .asof { margin-top: 10px; }
@@ -121,7 +132,31 @@ details p { color: var(--muted); font-size: .85rem; margin: 6px 0; }
 .method { margin: 14px 2px 0; }
 footer { margin-top: 18px; }
 footer p { margin: 6px 0; }
-@media (max-width: 560px) { .wrap { padding: 14px 10px 40px; } th, td { padding: 8px 5px; } }
+.editlink { font-size: .82rem; color: var(--accent); }
+.phone-only { display: none !important; }
+.reached { color: var(--accent); font-weight: 600; }
+td.na { color: var(--muted); }
+@media (min-width: 641px) {
+  /* keep the stock name visible while scrolling a wide table sideways */
+  th:first-child, td:first-child { position: sticky; left: 0; background: var(--card); z-index: 1; }
+}
+@media (max-width: 640px) {
+  .wrap { padding: 14px 10px 40px; }
+  .phone-only { display: flex !important; }
+  /* on a phone each stock becomes a compact card instead of a wide table */
+  .tablewrap { overflow: visible; }
+  table, tbody { display: block; }
+  thead { display: none; }
+  tbody tr { display: grid; grid-template-columns: 1fr 1fr; gap: 2px 14px; border: 1px solid var(--line);
+    border-radius: 10px; padding: 10px; margin-bottom: 10px; }
+  tbody td { display: flex; flex-direction: column; align-items: flex-start; text-align: left; border-bottom: 0;
+    padding: 4px 0; white-space: normal; }
+  tbody td::before { content: attr(data-label); font-size: .68rem; text-transform: uppercase;
+    letter-spacing: .04em; color: var(--muted); }
+  tbody td:first-child { grid-column: 1 / -1; }
+  tbody td:first-child::before { content: none; }
+  tbody td.na { display: none; }
+}
 </style>{% endraw %}
 </head>
 <body>
@@ -144,6 +179,7 @@ footer p { margin: 6px 0; }
 
 <script type="application/json" id="payload-buy">{{ buy | tojson }}</script>
 <script type="application/json" id="payload-sell">{{ sell | tojson }}</script>
+<script type="application/json" id="targets">{{ targets | tojson }}</script>
 {% raw %}<script>
 (function () {
   "use strict";
@@ -167,6 +203,10 @@ footer p { margin: 6px 0; }
     sell: "No holdings listed yet. Add tickers to data/holdings.txt in the repository, then run \"Daily sell watch\" from the Actions tab, or wait for the next daily run."
   };
 
+  var TARGETS = readJSON("targets") || {};
+  var TARGET_ENTRIES = TARGETS.entries || {};
+  function targetOf(r) { return TARGET_ENTRIES[r.market + ":" + r.ticker] || null; }
+
   function initPanel(name, data) {
     var root = document.getElementById("panel-" + name);
     var badge = document.querySelector('[data-tab="' + name + '"] .badge');
@@ -174,7 +214,7 @@ footer p { margin: 6px 0; }
     var upper = SIDE[name] === "upper";
 
     function showWarnings() {
-      var w = (data && data.warnings ? data.warnings : []).slice();
+      var w = (data && data.warnings ? data.warnings : []).concat(TARGETS.warnings || []);
       if (data && data.counts && data.counts.loaded < data.counts.universe) {
         w.push(data.counts.loaded + " of " + data.counts.universe + " stocks loaded; see data problems below.");
       }
@@ -195,10 +235,14 @@ footer p { margin: 6px 0; }
     var state = {
       win: "week", thr: Math.round(data.params.threshold * 1000) / 10,
       market: "ALL", type: "ALL", hideLiq: false, newOnly: false, showAll: false,
-      sort: "gap", dir: upper ? -1 : 1
+      rsi: "ALL", showHidden: false, sort: "gap", dir: upper ? -1 : 1
     };
     var hasEtf = ok.some(function (r) { return r.is_etf; });
     var hasNew = !!data.prev_as_of;
+    var hasRsi = ok.some(function (r) { return r.rsi != null; });
+    var rsiLow = data.params.rsi_oversold != null ? data.params.rsi_oversold : 30;
+    var rsiHigh = data.params.rsi_overbought != null ? data.params.rsi_overbought : 70;
+    function hiddenHere(r) { var t = targetOf(r); return !!(t && t.hide && t.hide.indexOf(name) >= 0); }
 
     function gapOf(r) { return state.win === "week" ? r.week_dist : r.qtd_dist; }
     function isNew(r) { return !!(state.win === "week" ? r.week_new : r.qtd_new); }
@@ -224,25 +268,56 @@ footer p { margin: 6px 0; }
       var k = state.sort, d = state.dir;
       list.sort(function (a, b) {
         if (k === "stock") return d * (a.ticker < b.ticker ? -1 : a.ticker > b.ticker ? 1 : 0);
+        if (k === "rsi") {  // stocks without an RSI always go last
+          if (a.rsi == null && b.rsi == null) return 0;
+          if (a.rsi == null) return 1;
+          if (b.rsi == null) return -1;
+          return d * (a.rsi - b.rsi);
+        }
         var x = k === "close" ? a.close_dist : gapOf(a);
         var y = k === "close" ? b.close_dist : gapOf(b);
         return d * (x - y);
       });
     }
 
+    function rsiCell(r) {
+      if (r.rsi == null) return '<td class="na" data-label="RSI (qtr)">–</td>';
+      var extreme = r.rsi <= rsiLow || r.rsi >= rsiHigh;
+      return '<td class="num" data-label="RSI (qtr)"><span' + (extreme ? ' class="reached"' : "") + ">" + r.rsi.toFixed(0) + "</span></td>";
+    }
+
+    // Target cells: the price you typed, and how far the last close is from it (target ÷ close − 1).
+    function targetCell(r, kind) {
+      var tg = targetOf(r), label = "Target " + kind;
+      var v = tg ? tg[kind] : null;
+      if (v == null || !r.close) return '<td class="na" data-label="' + label + '">–</td>';
+      var reached = kind === "buy" ? r.close <= v : r.close >= v;
+      return '<td class="num" data-label="' + label + '">' + price(v) + '<span class="small' + (reached ? " reached" : "") + '">' +
+        pct(v / r.close - 1) + (reached ? " · reached" : " to target") + "</span></td>";
+    }
+
+    // Every filter except hiding, so the "Show hidden (n)" count matches what ticking it would bring back.
+    function matchesFilters(r, t) {
+      var g = gapOf(r);
+      if (g == null) return false;
+      if (!state.showAll && !passes(g, t)) return false;
+      if (state.market !== "ALL" && r.market !== state.market) return false;
+      if (state.type === "ETF" && !r.is_etf) return false;
+      if (state.type === "STOCK" && r.is_etf) return false;
+      if (state.hideLiq && r.low_liquidity) return false;
+      if (state.newOnly && !isNew(r)) return false;
+      if (state.rsi === "OS" && !(r.rsi != null && r.rsi <= rsiLow)) return false;
+      if (state.rsi === "OB" && !(r.rsi != null && r.rsi >= rsiHigh)) return false;
+      return true;
+    }
+
     function render() {
       var t = state.thr / 100;
-      var list = ok.filter(function (r) {
-        var g = gapOf(r);
-        if (g == null) return false;
-        if (!state.showAll && !passes(g, t)) return false;
-        if (state.market !== "ALL" && r.market !== state.market) return false;
-        if (state.type === "ETF" && !r.is_etf) return false;
-        if (state.type === "STOCK" && r.is_etf) return false;
-        if (state.hideLiq && r.low_liquidity) return false;
-        if (state.newOnly && !isNew(r)) return false;
-        return true;
-      });
+      var matching = ok.filter(function (r) { return matchesFilters(r, t); });
+      var list = matching.filter(function (r) { return state.showHidden || !hiddenHere(r); });
+      var hiddenN = matching.filter(hiddenHere).length;
+      $("hiddenwrap").hidden = hiddenN === 0 && !state.showHidden;
+      $("hiddenlabel").textContent = "Show hidden (" + hiddenN + ")";
       sortRows(list);
 
       var us = list.filter(function (r) { return r.market === "US"; }).length;
@@ -275,16 +350,24 @@ footer p { margin: 6px 0; }
         }
         if (isNew(r)) chips += '<span class="chip hit">new</span>';
         if (r.is_etf) chips += '<span class="chip">ETF</span>';
+        if (r.rsi != null && r.rsi <= rsiLow) chips += '<span class="chip' + (upper ? "" : " hit") + '">RSI oversold</span>';
+        if (r.rsi != null && r.rsi >= rsiHigh) chips += '<span class="chip' + (upper ? " hit" : "") + '">RSI overbought</span>';
+        if (hiddenHere(r)) chips += '<span class="chip">hidden</span>';
+        var tg = targetOf(r);
+        if (tg && tg.buy != null && r.close <= tg.buy) chips += '<span class="chip hit">at buy target</span>';
+        if (tg && tg.sell != null && r.close >= tg.sell) chips += '<span class="chip hit">at sell target</span>';
         if (state.showAll && !passes(g, t)) chips += '<span class="chip">outside zone</span>';
         if (r.low_liquidity) chips += '<span class="chip">low liquidity</span>';
         var emphasised = upper ? g >= 0 : g < 0;
+        var edgeLabel = (state.win === "week" ? "Week " : "QTD ") + (upper ? "high" : "low");
         return "<tr>" +
           '<td><span class="tk">' + esc(r.ticker) + '</span><span class="mk">' + esc(r.market) + "</span>" +
           '<span class="nm">' + esc(r.name) + "</span>" + chips + "</td>" +
-          '<td><span class="gap' + (emphasised ? " hit" : "") + '">' + pct(g) + "</span></td>" +
-          '<td class="num" title="' + (upper ? "High" : "Low") + " on " + esc(edgeDateOf(r)) + '">' + price(edgeOf(r)) + "</td>" +
-          '<td class="num">' + price(upper ? r.upper : r.lower) + "</td>" +
-          '<td class="num">' + price(r.close) + '<span class="small">' + pct(r.close_dist) + " vs band</span></td>" +
+          '<td data-label="Gap"><span class="gap' + (emphasised ? " hit" : "") + '">' + pct(g) + "</span></td>" +
+          '<td class="num" data-label="' + edgeLabel + '" title="' + (upper ? "High" : "Low") + " on " + esc(edgeDateOf(r)) + '">' + price(edgeOf(r)) + "</td>" +
+          '<td class="num" data-label="' + (upper ? "Upper band" : "Lower band") + '">' + price(upper ? r.upper : r.lower) + "</td>" +
+          '<td class="num" data-label="Close">' + price(r.close) + '<span class="small">' + pct(r.close_dist) + " vs band</span></td>" +
+          rsiCell(r) + targetCell(r, "buy") + targetCell(r, "sell") +
           "</tr>";
       }).join("");
       $("empty").hidden = list.length > 0;
@@ -326,6 +409,9 @@ footer p { margin: 6px 0; }
       } else {
         text += "Gap = (lowest daily low in the window − lower band) ÷ lower band, so a negative gap means the low broke below the band. ";
       }
+      text += "RSI = Wilder RSI(" + (p.rsi_period || 14) + ") of the same quarterly closes (oversold at or below " + (p.rsi_oversold != null ? p.rsi_oversold : 30) +
+        ", overbought at or above " + (p.rsi_overbought != null ? p.rsi_overbought : 70) + "). " +
+        "Target % = target price ÷ last close − 1. ";
       text += "Week = last " + p.week_days + " trading days. " +
         "Low liquidity = average daily value under " + (p.liq_min_us / 1e6) + "M USD / " + (p.liq_min_au / 1e6) + "M AUD over " +
         p.liq_window + " sessions (flagged, never removed).";
@@ -356,6 +442,15 @@ footer p { margin: 6px 0; }
     $("typ").addEventListener("change", function (e) { state.type = e.target.value; render(); });
     $("newonly").addEventListener("change", function (e) { state.newOnly = e.target.checked; render(); });
     $("all").addEventListener("change", function (e) { state.showAll = e.target.checked; render(); });
+    $("rsiwrap").hidden = !hasRsi;
+    $("rsif").addEventListener("change", function (e) { state.rsi = e.target.value; render(); });
+    $("showhidden").addEventListener("change", function (e) { state.showHidden = e.target.checked; render(); });
+    if (TARGETS.edit_url) { var link = $("editlink"); link.href = TARGETS.edit_url; link.hidden = false; }
+    $("sortsel").addEventListener("change", function (e) {
+      state.sort = e.target.value;
+      state.dir = (state.sort === "stock" || !upper) ? 1 : -1;
+      render();
+    });
     root.querySelectorAll("th[data-sort]").forEach(function (th) {
       th.addEventListener("click", function () {
         var k = th.getAttribute("data-sort");

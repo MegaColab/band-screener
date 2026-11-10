@@ -1,0 +1,16 @@
+# Your own target buy / target sell prices, and stocks to hide on one tab.
+# The Buy and Sell tabs show these, with the % move still needed from the last close.
+#
+# One stock per line: the ticker, then any of
+#   buy=40.50     target buy price (in the stock's own currency: AUD for ASX, USD for US)
+#   sell=55       target sell price
+#   hide=buy      hide the stock on the Buy tab only   (hide=sell for the Sell tab, hide=buy,sell for both)
+#
+# Examples (remove the # to use):
+#   ASX:BHP  buy=40.5  sell=55
+#   NASDAQ:NVDA  sell=240  hide=buy
+#
+# This file is public, like the rest of the repository. Prices and tickers only: no quantities,
+# account names or notes. Edit it on GitHub (the pencil icon works on a phone); the Sell workflow
+# rebuilds the page within a few minutes.
+

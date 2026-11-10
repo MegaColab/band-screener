@@ -27,6 +27,11 @@ class Config:
     out_dir: Path
     keep_history: bool
     etf_file: Path | None = None  # tickers listed here are tagged ETF (drives the ETF filter)
+    rsi_period: int = 14
+    rsi_oversold: float = 30.0
+    rsi_overbought: float = 70.0
+    targets_file: Path | None = None  # manual target buy / sell prices and per-tab hiding
+    targets_edit_url: str = ""  # link shown on the page for editing the targets file
 
 
 def load_config(path: str | Path = "config.toml") -> Config:
@@ -40,6 +45,8 @@ def load_config(path: str | Path = "config.toml") -> Config:
     dat = raw.get("data", {})
     uni = raw.get("universe", {})
     out = raw.get("output", {})
+    rsi = raw.get("rsi", {})
+    tgt = raw.get("targets", {})
 
     params = SignalParams(
         bb_period=int(sig.get("bb_period", 20)),
@@ -59,6 +66,14 @@ def load_config(path: str | Path = "config.toml") -> Config:
     if sell_threshold <= 0:
         raise ValueError("sell.proximity_threshold must be greater than 0")
 
+    rsi_period = int(rsi.get("period", 14))
+    rsi_oversold = float(rsi.get("oversold", 30))
+    rsi_overbought = float(rsi.get("overbought", 70))
+    if rsi_period < 2:
+        raise ValueError("rsi.period must be >= 2")
+    if not 0 <= rsi_oversold < rsi_overbought <= 100:
+        raise ValueError("rsi.oversold must be below rsi.overbought, both between 0 and 100")
+
     return Config(
         root=root,
         signal=params,
@@ -76,4 +91,9 @@ def load_config(path: str | Path = "config.toml") -> Config:
         out_dir=root / out.get("dir", "docs"),
         keep_history=bool(out.get("keep_history", True)),
         etf_file=root / uni.get("etf_file", "data/etfs.txt"),
+        rsi_period=rsi_period,
+        rsi_oversold=rsi_oversold,
+        rsi_overbought=rsi_overbought,
+        targets_file=root / tgt.get("file", "data/targets.txt"),
+        targets_edit_url=str(tgt.get("edit_url", "")),
     )

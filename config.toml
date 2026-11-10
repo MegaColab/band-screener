@@ -12,6 +12,15 @@ band_mode = "live"         # "live": the unfinished quarter is the latest bar (l
 [sell]
 proximity_threshold = 0.10 # Sell tab: a holding shows when its HIGH is within 10% below the upper band, or above it
 
+[rsi]
+period = 14                # RSI is measured on the same quarterly closes as the bands
+oversold = 30              # at or below this the stock is tagged "RSI oversold"
+overbought = 70            # at or above this the stock is tagged "RSI overbought"
+
+[targets]
+file = "data/targets.txt"  # your own target buy / sell prices and per-tab hiding (public file)
+edit_url = "https://github.com/MegaColab/band-screener/edit/main/data/targets.txt"  # link shown on the page
+
 [liquidity]
 window_days = 60                  # average daily traded value over this many sessions
 min_avg_daily_value_us = 5000000  # USD. Stocks below this are flagged, never removed

@@ -23,9 +23,12 @@ FILES = {
 }
 
 
-def render_dashboard(buy: dict | None, sell: dict | None = None) -> str:
+NO_TARGETS = {"entries": {}, "warnings": [], "edit_url": ""}
+
+
+def render_dashboard(buy: dict | None, sell: dict | None = None, targets: dict | None = None) -> str:
     env = Environment(loader=FileSystemLoader(str(TEMPLATE_DIR)), autoescape=True)
-    return env.get_template("dashboard.html.j2").render(buy=buy, sell=sell)
+    return env.get_template("dashboard.html.j2").render(buy=buy, sell=sell, targets=targets or NO_TARGETS)
 
 
 def _dump(obj) -> str:
@@ -68,7 +71,7 @@ def read_previous_snapshot(out_dir: Path, side: str, as_of: str | None) -> dict 
         return None
 
 
-def write_outputs(payload: dict, out_dir: Path, keep_history: bool = True) -> list[Path]:
+def write_outputs(payload: dict, out_dir: Path, keep_history: bool = True, targets: dict | None = None) -> list[Path]:
     """Write this run's data file, its history record, and the page (served by GitHub Pages)."""
     out_dir = Path(out_dir)
     side = payload.get("side", "lower")
@@ -90,7 +93,7 @@ def write_outputs(payload: dict, out_dir: Path, keep_history: bool = True) -> li
     buy = payload if side == "lower" else read_latest(out_dir, "lower")
     sell = payload if side == "upper" else read_latest(out_dir, "upper")
     page = out_dir / "index.html"
-    page.write_text(render_dashboard(buy, sell), encoding="utf-8")
+    page.write_text(render_dashboard(buy, sell, targets), encoding="utf-8")
     written.append(page)
 
     nojekyll = out_dir / ".nojekyll"  # tell GitHub Pages to serve files as they are
