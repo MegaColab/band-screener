@@ -130,3 +130,70 @@ def load_universe(cfg, today: date | None = None) -> tuple[list[dict], list[str]
     asx, meta = load_asx200(cfg.asx200_file)
     warnings = us_warn + asx_list_warnings(meta, cfg.asx200_max_age_days, today)
     return us + asx, warnings, meta
+
+
+# --- holdings (the Sell tab) -------------------------------------------------
+
+US_EXCHANGES = {"NASDAQ", "NYSE", "NYSEARCA", "NYSEAMERICAN", "NYSEMKT", "AMEX", "BATS", "CBOE", "US"}
+
+
+def parse_holdings(text: str) -> tuple[list[dict], list[str]]:
+    """Parse the holdings file into universe rows, plus any entries that could not be understood.
+
+    Accepted entries (one per line or separated by commas/spaces; '#' starts a comment):
+      ASX:BHP   BHP.AX            -> ASX
+      NASDAQ:NVDA  NYSE:KO  NVDA  -> US (a plain symbol is treated as US)
+      BRK.B  BRK-B                -> US, written the way Yahoo expects
+    """
+    rows: list[dict] = []
+    problems: list[str] = []
+    seen: set[tuple[str, str]] = set()
+
+    for line in text.splitlines():
+        line = line.split("#", 1)[0]
+        for token in line.replace(",", " ").split():
+            entry = _holding_row(token)
+            if entry is None:
+                problems.append(token)
+                continue
+            key = (entry["market"], entry["ticker"])
+            if key not in seen:
+                seen.add(key)
+                rows.append(entry)
+    return rows, problems
+
+
+def _holding_row(token: str) -> dict | None:
+    token = token.strip().upper()
+    if not token:
+        return None
+    market = "US"
+    symbol = token
+    if ":" in token:
+        exchange, _, symbol = token.partition(":")
+        if exchange == "ASX":
+            market = "ASX"
+        elif exchange in US_EXCHANGES:
+            market = "US"
+        else:
+            return None  # an exchange we do not support
+    elif token.endswith(".AX"):
+        market, symbol = "ASX", token[:-3]
+    if not symbol or not all(ch.isalnum() or ch in ".-" for ch in symbol):
+        return None
+    if market == "ASX":
+        return {"ticker": symbol, "yahoo": yahoo_symbol_asx(symbol), "name": "", "market": "ASX",
+                "currency": "AUD", "sector": ""}
+    return {"ticker": symbol, "yahoo": yahoo_symbol_us(symbol), "name": "", "market": "US",
+            "currency": "USD", "sector": ""}
+
+
+def load_holdings(path: Path) -> tuple[list[dict], list[str]]:
+    """Read the holdings file. Returns (rows, warnings). A missing or empty file gives no rows."""
+    if not path.exists():
+        return [], []
+    rows, problems = parse_holdings(path.read_text(encoding="utf-8"))
+    warnings = []
+    if problems:
+        warnings.append("Skipped entries in the holdings list that could not be read: " + ", ".join(problems) + ".")
+    return rows, warnings

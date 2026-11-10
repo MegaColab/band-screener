@@ -1,0 +1,9 @@
+# Stocks to watch for the upper band (shown on the Sell tab).
+#
+# One ticker per line, or several separated by commas. Anything after a # is ignored.
+#   ASX stocks:  ASX:BHP   (or BHP.AX)
+#   US stocks:   NASDAQ:NVDA   NYSE:KO   (or just NVDA)
+#
+# TICKERS ONLY. This file is public: no quantities, prices or account names.
+# Edit it on the GitHub website or phone app; the next daily run picks it up.
+

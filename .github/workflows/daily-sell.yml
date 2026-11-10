@@ -1,0 +1,53 @@
+name: Daily sell watch
+
+on:
+  schedule:
+    # Mon-Fri 23:30 UTC = Tue-Sat morning in Sydney, after each US close.
+    - cron: "30 23 * * 1-5"
+  push:
+    paths:
+      - data/holdings.txt # edit the list on GitHub and the Sell tab refreshes within minutes
+  workflow_dispatch: # run it by hand from the Actions tab (works from a phone)
+
+permissions:
+  contents: write # the run commits the refreshed dashboard back to the repo
+
+concurrency:
+  group: publish-docs  # shared with the weekly screen so two runs never write docs/ at once
+  cancel-in-progress: false
+
+jobs:
+  sell:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run tests
+        run: python -m pytest -q
+
+      - name: Check the holdings
+        run: python -m bandscreener sell
+        env:
+          PYTHONPATH: src
+
+      - name: Publish results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs data
+          if git diff --cached --quiet; then
+            echo "Nothing changed."
+          else
+            git commit -m "Daily sell watch $(date -u +%F)"
+            git pull --rebase
+            git push
+          fi

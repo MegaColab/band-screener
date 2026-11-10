@@ -27,6 +27,11 @@ def demo_universe(n_us: int = 60, n_asx: int = 40) -> list[dict]:
     return rows
 
 
+def demo_holdings(n_us: int = 10, n_asx: int = 6) -> list[dict]:
+    """A small made-up holdings list for the Sell tab demo."""
+    return demo_universe(n_us, n_asx)
+
+
 def synthetic_prices(symbols: list[str], end: pd.Timestamp = DEMO_END, years: int = 6) -> dict[str, pd.DataFrame]:
     """Random-walk OHLCV. Some symbols fall hard near the end so the demo has matches."""
     idx = pd.bdate_range(end=end, periods=int(years * 252))
@@ -35,8 +40,11 @@ def synthetic_prices(symbols: list[str], end: pd.Timestamp = DEMO_END, years: in
         rng = np.random.default_rng(zlib.crc32(sym.encode()))
         vol = rng.uniform(0.010, 0.028)
         rets = rng.normal(rng.uniform(-0.0001, 0.0006), vol, len(idx))
-        if rng.random() < 0.35:  # a sell-off over the last ~3 months
+        mood = rng.random()
+        if mood < 0.35:  # a sell-off over the last ~3 months
             rets[-60:] += rng.uniform(-0.012, -0.004)
+        elif mood < 0.65:  # a rally over the last ~3 months
+            rets[-60:] += rng.uniform(0.004, 0.012)
         close = rng.uniform(5, 250) * np.exp(np.cumsum(rets))
         low = close * (1 - np.abs(rng.normal(0, 0.009, len(idx))))
         high = close * (1 + np.abs(rng.normal(0, 0.009, len(idx))))

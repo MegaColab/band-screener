@@ -10,7 +10,7 @@ permissions:
   contents: write # the run commits the refreshed dashboard back to the repo
 
 concurrency:
-  group: weekly-screen
+  group: publish-docs  # shared with the daily sell watch so two runs never write docs/ at once
   cancel-in-progress: false
 
 jobs:

@@ -1,10 +1,56 @@
+{% macro panel(id) %}
+<section class="panel" id="panel-{{ id }}" data-panel="{{ id }}" hidden>
+  <p class="asof" data-role="asof"></p>
+  <div data-role="warnings"></div>
+  <div class="card" data-role="nodata" hidden></div>
+  <div data-role="body">
+    <div class="card">
+      <div class="controls">
+        <div class="seg" role="group" aria-label="Window">
+          <button type="button" data-win="week" data-role="winweek" aria-pressed="true"></button>
+          <button type="button" data-win="qtd" data-role="winqtd" aria-pressed="false"></button>
+        </div>
+        <label>Within <input data-role="thr" type="number" min="0" max="100" step="1" inputmode="decimal"> % of <span data-role="bandname"></span> band</label>
+        <label>Market
+          <select data-role="mkt"><option value="ALL">All</option><option value="US">US</option><option value="ASX">ASX</option></select>
+        </label>
+        <label><input data-role="liq" type="checkbox"> Hide low-liquidity</label>
+      </div>
+    </div>
+
+    <div class="card">
+      <p class="summary" data-role="summary"></p>
+      <div class="tablewrap">
+        <table>
+          <thead>
+            <tr>
+              <th data-sort="stock">Stock</th>
+              <th data-sort="gap" data-role="gaphead">Gap to band</th>
+              <th data-role="edgehead">Low</th>
+              <th data-role="bandhead">Band</th>
+              <th data-sort="close">Close</th>
+            </tr>
+          </thead>
+          <tbody data-role="tbody"></tbody>
+        </table>
+      </div>
+      <div class="empty" data-role="empty" hidden>No stocks match these settings.</div>
+    </div>
+
+    <details class="card" data-role="negband"></details>
+    <details class="card" data-role="history"></details>
+    <details class="card" data-role="issues"></details>
+    <p class="method" data-role="method"></p>
+  </div>
+</section>
+{% endmacro %}
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="color-scheme" content="light dark">
-<title>Lower Band Screener</title>
+<title>Band Screener</title>
 {% raw %}<style>
 :root {
   --bg: #f5f6f8; --card: #ffffff; --ink: #151a22; --muted: #5b6573; --line: #e2e6ec;
@@ -17,12 +63,19 @@
   }
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 body { margin: 0; background: var(--bg); color: var(--ink);
   font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
 .wrap { max-width: 980px; margin: 0 auto; padding: 20px 16px 48px; }
 h1 { font-size: 1.4rem; margin: 0 0 2px; }
 .sub, .asof { margin: 0; color: var(--muted); font-size: .88rem; }
-.asof { margin-top: 2px; }
+.asof { margin-top: 10px; }
+.tabs { margin-top: 14px; display: flex; width: 100%; }
+.tabs button { flex: 1; padding: 10px 12px; font-weight: 600; }
+.badge { display: inline-block; min-width: 1.6em; padding: 0 6px; margin-left: 6px; border-radius: 999px;
+  background: var(--chip); color: var(--muted); font-size: .75rem; line-height: 1.5; text-align: center; }
+.badge:empty { display: none; }
+.tabs button[aria-pressed="true"] .badge { background: rgba(255,255,255,.25); color: #fff; }
 .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-top: 14px; }
 .controls { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center; }
 .controls label { font-size: .82rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
@@ -34,7 +87,7 @@ input[type=number], select { background: var(--card); color: var(--ink); border:
 input[type=number] { width: 4.5em; }
 .notice { background: var(--warn-bg); color: var(--warn); border-radius: 10px; padding: 10px 12px;
   margin-top: 12px; font-size: .88rem; }
-#summary { font-weight: 600; margin: 0 0 10px; }
+.summary { font-weight: 600; margin: 0 0 10px; }
 .tablewrap { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; }
 th, td { text-align: right; padding: 9px 8px; border-bottom: 1px solid var(--line); vertical-align: top; white-space: nowrap; }
@@ -48,9 +101,9 @@ tbody tr:last-child td { border-bottom: 0; }
 .nm { display: block; font-size: .8rem; color: var(--muted); max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .chip { display: inline-block; font-size: .68rem; padding: 1px 7px; border-radius: 999px; background: var(--chip);
   color: var(--muted); margin: 3px 4px 0 0; }
-.chip.below { background: var(--hit); color: var(--accent); font-weight: 600; }
+.chip.hit { background: var(--hit); color: var(--accent); font-weight: 600; }
 .gap { font-weight: 700; font-variant-numeric: tabular-nums; }
-.gap.neg { color: var(--accent); }
+.gap.hit { color: var(--accent); }
 .num { font-variant-numeric: tabular-nums; }
 .small { display: block; font-size: .75rem; color: var(--muted); }
 .empty { color: var(--muted); padding: 18px 4px; }
@@ -59,72 +112,38 @@ summary { cursor: pointer; font-weight: 600; }
 details p { color: var(--muted); font-size: .85rem; margin: 6px 0; }
 .tags { display: flex; flex-wrap: wrap; gap: 4px 6px; margin-top: 8px; }
 .tags span { background: var(--chip); border-radius: 6px; padding: 2px 7px; font-size: .78rem; }
-footer { margin-top: 18px; color: var(--muted); font-size: .8rem; }
+.method, footer { color: var(--muted); font-size: .8rem; }
+.method { margin: 14px 2px 0; }
+footer { margin-top: 18px; }
 footer p { margin: 6px 0; }
-@media (max-width: 560px) { .wrap { padding: 14px 10px 40px; } th, td { padding: 8px 5px; } .hide-sm { display: none; } }
+@media (max-width: 560px) { .wrap { padding: 14px 10px 40px; } th, td { padding: 8px 5px; } }
 </style>{% endraw %}
 </head>
 <body>
 <div class="wrap">
-  <h1>Lower Band Screener</h1>
+  <h1>Band Screener</h1>
   <p class="sub">S&amp;P 500 and ASX 200 &middot; quarterly Bollinger Bands</p>
-  <p class="asof">Prices to {{ payload.as_of }} &middot; built {{ payload.generated_at }}</p>
 
-  <div id="warnings"></div>
-
-  <div class="card">
-    <div class="controls">
-      <div class="seg" role="group" aria-label="Low window">
-        <button type="button" data-win="week" aria-pressed="true">Week low</button>
-        <button type="button" data-win="qtd" aria-pressed="false">Quarter-to-date low</button>
-      </div>
-      <label>Within <input id="thr" type="number" min="0" max="100" step="1" inputmode="decimal"> % of lower band</label>
-      <label>Market
-        <select id="mkt"><option value="ALL">All</option><option value="US">US</option><option value="ASX">ASX</option></select>
-      </label>
-      <label><input id="liq" type="checkbox"> Hide low-liquidity</label>
-    </div>
+  <div class="seg tabs" role="tablist" aria-label="Screen">
+    <button type="button" data-tab="buy" aria-pressed="true">Buy: near lower band<span class="badge"></span></button>
+    <button type="button" data-tab="sell" aria-pressed="false">Sell: near upper band<span class="badge"></span></button>
   </div>
 
-  <div class="card">
-    <p id="summary"></p>
-    <div class="tablewrap">
-      <table>
-        <thead>
-          <tr>
-            <th data-sort="stock">Stock</th>
-            <th data-sort="gap" id="gaphead">Gap to band</th>
-            <th id="lowhead">Low</th>
-            <th>Lower band</th>
-            <th data-sort="close">Close</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>
-    <div id="empty" class="empty" hidden>No stocks match these settings.</div>
-  </div>
-
-  <details class="card" id="negband"></details>
-  <details class="card" id="history"></details>
-  <details class="card" id="issues"></details>
+  {{ panel("buy") }}
+  {{ panel("sell") }}
 
   <footer>
-    <p id="method"></p>
     <p>Screening output only, not investment advice. Prices come from Yahoo Finance and can contain errors.</p>
   </footer>
 </div>
 
-<script type="application/json" id="payload">{{ payload | tojson }}</script>
+<script type="application/json" id="payload-buy">{{ buy | tojson }}</script>
+<script type="application/json" id="payload-sell">{{ sell | tojson }}</script>
 {% raw %}<script>
 (function () {
   "use strict";
-  var data = JSON.parse(document.getElementById("payload").textContent);
-  var rows = data.rows;
-  var ok = rows.filter(function (r) { return r.status === "ok"; });
-  var state = { win: "week", thr: Math.round(data.params.threshold * 1000) / 10, market: "ALL", hideLiq: false, sort: "gap", dir: 1 };
 
-  function $(s) { return document.querySelector(s); }
+  function readJSON(id) { return JSON.parse(document.getElementById(id).textContent); }
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
@@ -136,135 +155,211 @@ footer p { margin: 6px 0; }
     return sign + Math.abs(x * 100).toFixed(d == null ? 1 : d) + "%";
   }
   function price(x) { return x == null ? "–" : (x >= 1 ? x.toFixed(2) : x.toFixed(3)); }
-  function gapOf(r) { return state.win === "week" ? r.week_dist : r.qtd_dist; }
-  function lowOf(r) { return state.win === "week" ? r.week_low : r.qtd_low; }
-  function lowDateOf(r) { return state.win === "week" ? r.week_low_date : r.qtd_low_date; }
 
-  function matches() {
-    var t = state.thr / 100;
-    return ok.filter(function (r) {
-      var g = gapOf(r);
-      if (g == null || g > t) return false;
-      if (state.market !== "ALL" && r.market !== state.market) return false;
-      if (state.hideLiq && r.low_liquidity) return false;
-      return true;
-    });
-  }
+  var SIDE = { buy: "lower", sell: "upper" };
+  var EMPTY_TEXT = {
+    buy: "No results yet. Open the repository's Actions tab, choose \"Weekly screen\", and press Run workflow.",
+    sell: "No holdings listed yet. Add tickers to data/holdings.txt in the repository, then run \"Daily sell watch\" from the Actions tab, or wait for the next daily run."
+  };
 
-  function sortRows(list) {
-    var k = state.sort, d = state.dir;
-    list.sort(function (a, b) {
-      var x, y;
-      if (k === "stock") { x = a.ticker; y = b.ticker; return d * (x < y ? -1 : x > y ? 1 : 0); }
-      if (k === "close") { x = a.close_dist; y = b.close_dist; }
-      else { x = gapOf(a); y = gapOf(b); }
-      return d * (x - y);
-    });
-  }
+  function initPanel(name, data) {
+    var root = document.getElementById("panel-" + name);
+    var badge = document.querySelector('[data-tab="' + name + '"] .badge');
+    function $(role) { return root.querySelector('[data-role="' + role + '"]'); }
+    var upper = SIDE[name] === "upper";
 
-  function render() {
-    var t = state.thr / 100;
-    var list = matches();
-    sortRows(list);
-    var us = list.filter(function (r) { return r.market === "US"; }).length;
-    var asx = list.length - us;
-    var winName = state.win === "week" ? "this week's low" : "the quarter-to-date low";
-    $("#summary").textContent = list.length + " stock" + (list.length === 1 ? "" : "s") + " with " + winName +
-      " within " + state.thr + "% of the lower band (US " + us + ", ASX " + asx + ")";
-    $("#gaphead").textContent = state.win === "week" ? "Week low gap" : "QTD low gap";
-    $("#lowhead").textContent = state.win === "week" ? "Week low" : "QTD low";
+    function showWarnings() {
+      var w = (data && data.warnings ? data.warnings : []).slice();
+      if (data && data.counts && data.counts.loaded < data.counts.universe) {
+        w.push(data.counts.loaded + " of " + data.counts.universe + " stocks loaded; see data problems below.");
+      }
+      $("warnings").innerHTML = w.map(function (m) { return '<div class="notice">' + esc(m) + "</div>"; }).join("");
+    }
 
-    $("#tbody").innerHTML = list.map(function (r) {
-      var g = gapOf(r);
-      var chips = "";
-      if (g < 0) chips += '<span class="chip below">broke below</span>';
-      if (g <= t && r.close_dist > t) chips += '<span class="chip">rallied since</span>';
-      if (r.low_liquidity) chips += '<span class="chip">low liquidity</span>';
-      return "<tr>" +
-        '<td><span class="tk">' + esc(r.ticker) + '</span><span class="mk">' + esc(r.market) + "</span>" +
-        '<span class="nm">' + esc(r.name) + "</span>" + chips + "</td>" +
-        '<td><span class="gap' + (g < 0 ? " neg" : "") + '">' + pct(g) + "</span></td>" +
-        '<td class="num" title="Low on ' + esc(lowDateOf(r)) + '">' + price(lowOf(r)) + "</td>" +
-        '<td class="num">' + price(r.lower) + "</td>" +
-        '<td class="num">' + price(r.close) + '<span class="small">' + pct(r.close_dist) + " vs band</span></td>" +
-        "</tr>";
-    }).join("");
-    $("#empty").hidden = list.length > 0;
-  }
+    if (!data || data.empty || !data.rows || !data.rows.length) {
+      $("body").hidden = true;
+      var box = $("nodata");
+      box.hidden = false;
+      box.textContent = EMPTY_TEXT[name];
+      showWarnings();
+      return;
+    }
 
-  function tagSection(sel, title, intro, items) {
-    var el = $(sel);
-    if (!items.length) { el.hidden = true; return; }
-    el.innerHTML = "<summary>" + esc(title) + " (" + items.length + ")</summary><p>" + esc(intro) + '</p><div class="tags">' +
-      items.map(function (t) { return "<span>" + esc(t) + "</span>"; }).join("") + "</div>";
-  }
+    var rows = data.rows;
+    var ok = rows.filter(function (r) { return r.status === "ok"; });
+    var state = {
+      win: "week", thr: Math.round(data.params.threshold * 1000) / 10,
+      market: "ALL", hideLiq: false, sort: "gap", dir: upper ? -1 : 1
+    };
 
-  function sections() {
-    var neg = rows.filter(function (r) { return r.status === "negative_band"; })
-      .map(function (r) { return r.ticker + " (" + r.market + ") band " + price(r.lower); });
-    tagSection("#negband", "Band not meaningful",
-      "The lower band is at or below zero, so any price would pass. Check these on a chart.", neg);
+    function gapOf(r) { return state.win === "week" ? r.week_dist : r.qtd_dist; }
+    function edgeOf(r) {
+      if (upper) return state.win === "week" ? r.week_high : r.qtd_high;
+      return state.win === "week" ? r.week_low : r.qtd_low;
+    }
+    function edgeDateOf(r) {
+      if (upper) return state.win === "week" ? r.week_high_date : r.qtd_high_date;
+      return state.win === "week" ? r.week_low_date : r.qtd_low_date;
+    }
+    function passes(g, t) { return upper ? g >= -t : g <= t; }
 
-    var hist = rows.filter(function (r) { return r.status === "insufficient_history"; })
-      .map(function (r) { return r.ticker + " (" + (r.bars || 0) + " qtrs)"; });
-    tagSection("#history", "Not enough history",
-      "Fewer than " + data.params.bb_period + " quarterly bars, so no band can be calculated.", hist);
+    var winNames = upper ? { week: "Week high", qtd: "Quarter-to-date high" }
+                         : { week: "Week low", qtd: "Quarter-to-date low" };
+    $("winweek").textContent = winNames.week;
+    $("winqtd").textContent = winNames.qtd;
+    $("bandname").textContent = upper ? "upper" : "lower";
+    $("bandhead").textContent = upper ? "Upper band" : "Lower band";
+    $("asof").textContent = "Prices to " + data.as_of + " · built " + data.generated_at;
 
-    var labels = { no_data: "no data", stale: "stale" };
-    var issues = rows.filter(function (r) { return r.status === "no_data" || r.status === "stale"; })
-      .map(function (r) { return r.ticker + " (" + r.market + ", " + labels[r.status] + (r.last_date ? " since " + r.last_date : "") + ")"; });
-    tagSection("#issues", "Data problems",
-      "Yahoo Finance returned nothing, or the last price is more than a week old.", issues);
-  }
-
-  function warnings() {
-    var box = $("#warnings");
-    var w = data.warnings.slice();
-    var c = data.counts;
-    if (c.loaded < c.universe) w.push(c.loaded + " of " + c.universe + " stocks loaded; see data problems below.");
-    box.innerHTML = w.map(function (m) { return '<div class="notice">' + esc(m) + "</div>"; }).join("");
-  }
-
-  function method() {
-    var p = data.params;
-    var asx = data.asx_list || {};
-    var text = "Bands: average of the last " + p.bb_period + " quarterly closes ± " + p.bb_std + " standard deviations, " +
-      (p.band_mode === "live" ? "including the unfinished quarter" : "completed quarters only") + ". " +
-      "Gap = (lowest daily low in the window − lower band) ÷ lower band. Week = last " + p.week_days + " trading days. " +
-      "Low liquidity = average daily value under " + (p.liq_min_us / 1e6) + "M USD / " + (p.liq_min_au / 1e6) + "M AUD over " + p.liq_window + " sessions (flagged, never removed).";
-    if (asx.as_of) text += " ASX 200 list as at " + asx.as_of + (asx.note ? " (" + asx.note + ")" : "") + ".";
-    $("#method").textContent = text;
-  }
-
-  document.querySelectorAll("[data-win]").forEach(function (b) {
-    b.addEventListener("click", function () {
-      state.win = b.getAttribute("data-win");
-      document.querySelectorAll("[data-win]").forEach(function (o) {
-        o.setAttribute("aria-pressed", o === b ? "true" : "false");
+    function sortRows(list) {
+      var k = state.sort, d = state.dir;
+      list.sort(function (a, b) {
+        if (k === "stock") return d * (a.ticker < b.ticker ? -1 : a.ticker > b.ticker ? 1 : 0);
+        var x = k === "close" ? a.close_dist : gapOf(a);
+        var y = k === "close" ? b.close_dist : gapOf(b);
+        return d * (x - y);
       });
+    }
+
+    function render() {
+      var t = state.thr / 100;
+      var list = ok.filter(function (r) {
+        var g = gapOf(r);
+        if (g == null || !passes(g, t)) return false;
+        if (state.market !== "ALL" && r.market !== state.market) return false;
+        if (state.hideLiq && r.low_liquidity) return false;
+        return true;
+      });
+      sortRows(list);
+
+      var us = list.filter(function (r) { return r.market === "US"; }).length;
+      var asx = list.length - us;
+      var what = (upper ? (state.win === "week" ? "this week's high" : "the quarter-to-date high")
+                        : (state.win === "week" ? "this week's low" : "the quarter-to-date low"));
+      var rel = upper ? "within " + state.thr + "% below the upper band, or above it"
+                      : "within " + state.thr + "% of the lower band";
+      $("summary").textContent = list.length + " stock" + (list.length === 1 ? "" : "s") + " with " + what +
+        " " + rel + " (US " + us + ", ASX " + asx + ")";
+      $("gaphead").textContent = (state.win === "week" ? "Week" : "QTD") + (upper ? " high gap" : " low gap");
+      $("edgehead").textContent = state.win === "week" ? (upper ? "Week high" : "Week low") : (upper ? "QTD high" : "QTD low");
+      if (badge) badge.textContent = list.length;
+
+      $("tbody").innerHTML = list.map(function (r) {
+        var g = gapOf(r);
+        var chips = "";
+        if (upper) {
+          if (g >= 0) chips += '<span class="chip hit">above band</span>';
+          if (g >= -t && r.close_dist < -t) chips += '<span class="chip">pulled back since</span>';
+        } else {
+          if (g < 0) chips += '<span class="chip hit">broke below</span>';
+          if (g <= t && r.close_dist > t) chips += '<span class="chip">rallied since</span>';
+        }
+        if (r.low_liquidity) chips += '<span class="chip">low liquidity</span>';
+        var emphasised = upper ? g >= 0 : g < 0;
+        return "<tr>" +
+          '<td><span class="tk">' + esc(r.ticker) + '</span><span class="mk">' + esc(r.market) + "</span>" +
+          '<span class="nm">' + esc(r.name) + "</span>" + chips + "</td>" +
+          '<td><span class="gap' + (emphasised ? " hit" : "") + '">' + pct(g) + "</span></td>" +
+          '<td class="num" title="' + (upper ? "High" : "Low") + " on " + esc(edgeDateOf(r)) + '">' + price(edgeOf(r)) + "</td>" +
+          '<td class="num">' + price(upper ? r.upper : r.lower) + "</td>" +
+          '<td class="num">' + price(r.close) + '<span class="small">' + pct(r.close_dist) + " vs band</span></td>" +
+          "</tr>";
+      }).join("");
+      $("empty").hidden = list.length > 0;
+    }
+
+    function tagSection(role, title, intro, items) {
+      var el = $(role);
+      if (!items.length) { el.hidden = true; return; }
+      el.hidden = false;
+      el.innerHTML = "<summary>" + esc(title) + " (" + items.length + ")</summary><p>" + esc(intro) +
+        '</p><div class="tags">' + items.map(function (t) { return "<span>" + esc(t) + "</span>"; }).join("") + "</div>";
+    }
+
+    function sections() {
+      var neg = rows.filter(function (r) { return r.status === "negative_band"; })
+        .map(function (r) { return r.ticker + " (" + r.market + ") band " + price(r.lower); });
+      tagSection("negband", "Band not meaningful",
+        "The lower band is at or below zero, so any price would pass. Check these on a chart.", neg);
+
+      var hist = rows.filter(function (r) { return r.status === "insufficient_history"; })
+        .map(function (r) { return r.ticker + " (" + r.market + ", " + (r.bars || 0) + " qtrs)"; });
+      tagSection("history", "Not enough history",
+        "Fewer than " + data.params.bb_period + " quarterly bars, so no band can be calculated.", hist);
+
+      var labels = { no_data: "no data", stale: "stale" };
+      var issues = rows.filter(function (r) { return r.status === "no_data" || r.status === "stale"; })
+        .map(function (r) { return r.ticker + " (" + r.market + ", " + labels[r.status] + (r.last_date ? " since " + r.last_date : "") + ")"; });
+      tagSection("issues", "Data problems",
+        "Yahoo Finance returned nothing, or the last price is more than a week old.", issues);
+    }
+
+    function method() {
+      var p = data.params;
+      var asxMeta = data.asx_list || {};
+      var text = "Bands: average of the last " + p.bb_period + " quarterly closes ± " + p.bb_std + " standard deviations, " +
+        (p.band_mode === "live" ? "including the unfinished quarter" : "completed quarters only") + ". ";
+      if (upper) {
+        text += "Gap = (highest daily high in the window − upper band) ÷ upper band, so a positive gap means the high went above the band. ";
+      } else {
+        text += "Gap = (lowest daily low in the window − lower band) ÷ lower band, so a negative gap means the low broke below the band. ";
+      }
+      text += "Week = last " + p.week_days + " trading days. " +
+        "Low liquidity = average daily value under " + (p.liq_min_us / 1e6) + "M USD / " + (p.liq_min_au / 1e6) + "M AUD over " +
+        p.liq_window + " sessions (flagged, never removed).";
+      if (!upper && asxMeta.as_of) text += " ASX 200 list as at " + asxMeta.as_of + (asxMeta.note ? " (" + asxMeta.note + ")" : "") + ".";
+      $("method").textContent = text;
+    }
+
+    root.querySelectorAll("[data-win]").forEach(function (b) {
+      b.addEventListener("click", function () {
+        state.win = b.getAttribute("data-win");
+        root.querySelectorAll("[data-win]").forEach(function (o) {
+          o.setAttribute("aria-pressed", o === b ? "true" : "false");
+        });
+        render();
+      });
+    });
+    var thr = $("thr");
+    thr.value = state.thr;
+    thr.addEventListener("input", function (e) {
+      var v = parseFloat(e.target.value);
+      state.thr = isNaN(v) ? 0 : v;
       render();
     });
-  });
-  $("#thr").value = state.thr;
-  $("#thr").addEventListener("input", function (e) {
-    var v = parseFloat(e.target.value);
-    state.thr = isNaN(v) ? 0 : v;
+    $("mkt").addEventListener("change", function (e) { state.market = e.target.value; render(); });
+    $("liq").addEventListener("change", function (e) { state.hideLiq = e.target.checked; render(); });
+    root.querySelectorAll("th[data-sort]").forEach(function (th) {
+      th.addEventListener("click", function () {
+        var k = th.getAttribute("data-sort");
+        if (state.sort === k) state.dir = -state.dir; else { state.sort = k; state.dir = (k === "stock" || !upper) ? 1 : -1; }
+        render();
+      });
+    });
+
+    showWarnings();
+    sections();
+    method();
     render();
-  });
-  $("#mkt").addEventListener("change", function (e) { state.market = e.target.value; render(); });
-  $("#liq").addEventListener("change", function (e) { state.hideLiq = e.target.checked; render(); });
-  document.querySelectorAll("th[data-sort]").forEach(function (th) {
-    th.addEventListener("click", function () {
-      var k = th.getAttribute("data-sort");
-      if (state.sort === k) state.dir = -state.dir; else { state.sort = k; state.dir = 1; }
-      render();
+  }
+
+  function show(name) {
+    ["buy", "sell"].forEach(function (n) {
+      document.getElementById("panel-" + n).hidden = n !== name;
     });
+    document.querySelectorAll("[data-tab]").forEach(function (b) {
+      b.setAttribute("aria-pressed", b.getAttribute("data-tab") === name ? "true" : "false");
+    });
+    try { history.replaceState(null, "", "#" + name); } catch (e) { /* not essential */ }
+  }
+
+  document.querySelectorAll("[data-tab]").forEach(function (b) {
+    b.addEventListener("click", function () { show(b.getAttribute("data-tab")); });
   });
 
-  warnings();
-  sections();
-  method();
-  render();
+  initPanel("buy", readJSON("payload-buy"));
+  initPanel("sell", readJSON("payload-sell"));
+  show((location.hash || "").replace("#", "") === "sell" ? "sell" : "buy");
 })();
 </script>{% endraw %}
 </body>

@@ -1,15 +1,20 @@
-"""Glue: run the signal over the whole universe and build the dashboard payload."""
+"""Glue: run the signal over a universe and build the dashboard payload.
+
+``side`` is "lower" for the Buy tab (stocks near the lower band) and "upper" for the
+Sell tab (holdings near the upper band).
+"""
 
 from __future__ import annotations
 
 import math
 from collections import Counter
+from dataclasses import replace
 from datetime import datetime, timezone
 
 import pandas as pd
 
 from .config import Config
-from .signals import evaluate
+from .signals import evaluate, evaluate_upper
 
 ROUND_DIGITS = 5
 
@@ -27,6 +32,25 @@ def _clean(value):
     return value
 
 
+def _params_block(cfg: Config, signal) -> dict:
+    return {
+        "threshold": signal.threshold,
+        "week_days": signal.week_days,
+        "bb_period": signal.bb_period,
+        "bb_std": signal.bb_std,
+        "band_mode": signal.band_mode,
+        "liq_window": cfg.liq_window,
+        "liq_min_us": cfg.liq_min_us,
+        "liq_min_au": cfg.liq_min_au,
+    }
+
+
+def _signal_for(cfg: Config, side: str):
+    if side == "upper":
+        return replace(cfg.signal, threshold=cfg.sell_threshold)
+    return cfg.signal
+
+
 def build_payload(
     cfg: Config,
     universe: list[dict],
@@ -34,17 +58,20 @@ def build_payload(
     warnings: list[str],
     asx_meta: dict | None = None,
     generated_at: datetime | None = None,
+    side: str = "lower",
 ) -> dict:
     if not prices:
         raise RuntimeError("No price data was loaded.")
 
+    signal = _signal_for(cfg, side)
+    evaluator = evaluate_upper if side == "upper" else evaluate
     latest = max(df.index[-1] for df in prices.values())
     as_of = latest  # the quarter that contains the latest trading day is the "current" quarter
     generated_at = generated_at or datetime.now(timezone.utc)
 
     rows = []
     for stock in universe:
-        result = evaluate(prices.get(stock["yahoo"]), cfg.signal, as_of, latest, cfg.liq_window)
+        result = evaluator(prices.get(stock["yahoo"]), signal, as_of, latest, cfg.liq_window)
         row = {k: stock[k] for k in ("ticker", "name", "market", "currency", "sector")}
         row.update(result)
         min_adv = cfg.liq_min_us if stock["currency"] == "USD" else cfg.liq_min_au
@@ -53,20 +80,12 @@ def build_payload(
         rows.append(_clean(row))
 
     loaded = sum(1 for s in universe if s["yahoo"] in prices)
-    sig = cfg.signal
     return {
+        "side": side,
+        "empty": False,
         "generated_at": generated_at.strftime("%Y-%m-%d %H:%M UTC"),
         "as_of": latest.strftime("%Y-%m-%d"),
-        "params": {
-            "threshold": sig.threshold,
-            "week_days": sig.week_days,
-            "bb_period": sig.bb_period,
-            "bb_std": sig.bb_std,
-            "band_mode": sig.band_mode,
-            "liq_window": cfg.liq_window,
-            "liq_min_us": cfg.liq_min_us,
-            "liq_min_au": cfg.liq_min_au,
-        },
+        "params": _params_block(cfg, signal),
         "counts": {
             "universe": len(universe),
             "loaded": loaded,
@@ -79,9 +98,28 @@ def build_payload(
     }
 
 
+def build_empty_payload(cfg: Config, side: str, warnings: list[str], generated_at: datetime | None = None) -> dict:
+    """A payload with no stocks, used when the holdings list is still empty."""
+    generated_at = generated_at or datetime.now(timezone.utc)
+    return {
+        "side": side,
+        "empty": True,
+        "generated_at": generated_at.strftime("%Y-%m-%d %H:%M UTC"),
+        "as_of": None,
+        "params": _params_block(cfg, _signal_for(cfg, side)),
+        "counts": {"universe": 0, "loaded": 0, "by_status": {}, "by_market": {}},
+        "warnings": warnings,
+        "asx_list": {},
+        "rows": [],
+    }
+
+
 def history_snapshot(payload: dict) -> dict:
-    """Small hits-only record for the weekly history file (keeps the repo light)."""
-    keep = ("ticker", "market", "week_low", "lower", "week_dist", "qtd_dist", "close_dist")
+    """Small hits-only record for the history file (keeps the repo light)."""
+    if payload.get("side") == "upper":
+        keep = ("ticker", "market", "week_high", "upper", "week_dist", "qtd_dist", "close_dist")
+    else:
+        keep = ("ticker", "market", "week_low", "lower", "week_dist", "qtd_dist", "close_dist")
     hits = [
         {k: r.get(k) for k in keep}
         for r in payload["rows"]

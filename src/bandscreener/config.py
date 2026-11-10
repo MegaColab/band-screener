@@ -13,6 +13,7 @@ from .signals import SignalParams
 class Config:
     root: Path
     signal: SignalParams
+    sell_threshold: float
     liq_window: int
     liq_min_us: float
     liq_min_au: float
@@ -22,6 +23,7 @@ class Config:
     asx200_file: Path
     asx200_max_age_days: int
     sp500_cache_file: Path
+    holdings_file: Path
     out_dir: Path
     keep_history: bool
 
@@ -32,6 +34,7 @@ def load_config(path: str | Path = "config.toml") -> Config:
     raw = tomllib.loads(path.read_text(encoding="utf-8"))
 
     sig = raw.get("signal", {})
+    sell = raw.get("sell", {})
     liq = raw.get("liquidity", {})
     dat = raw.get("data", {})
     uni = raw.get("universe", {})
@@ -51,9 +54,14 @@ def load_config(path: str | Path = "config.toml") -> Config:
     if params.bb_period < 2 or params.week_days < 1:
         raise ValueError("bb_period must be >= 2 and week_lookback_days >= 1")
 
+    sell_threshold = float(sell.get("proximity_threshold", params.threshold))
+    if sell_threshold <= 0:
+        raise ValueError("sell.proximity_threshold must be greater than 0")
+
     return Config(
         root=root,
         signal=params,
+        sell_threshold=sell_threshold,
         liq_window=int(liq.get("window_days", 60)),
         liq_min_us=float(liq.get("min_avg_daily_value_us", 5_000_000)),
         liq_min_au=float(liq.get("min_avg_daily_value_au", 1_000_000)),
@@ -63,6 +71,7 @@ def load_config(path: str | Path = "config.toml") -> Config:
         asx200_file=root / uni.get("asx200_file", "data/asx200.csv"),
         asx200_max_age_days=int(uni.get("asx200_max_age_days", 100)),
         sp500_cache_file=root / uni.get("sp500_cache_file", "data/sp500_cache.csv"),
+        holdings_file=root / uni.get("holdings_file", "data/holdings.txt"),
         out_dir=root / out.get("dir", "docs"),
         keep_history=bool(out.get("keep_history", True)),
     )

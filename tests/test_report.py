@@ -44,15 +44,28 @@ def test_history_snapshot_contains_only_hits():
     assert {h["ticker"] for h in snap["hits"]} == hit_tickers
 
 
+def _embedded(html, name):
+    marker = f'id="payload-{name}">'
+    start = html.index(marker) + len(marker)
+    return json.loads(html[start : html.index("</script>", start)])
+
+
 def test_dashboard_renders_and_embeds_data():
     _, payload = demo_payload()
-    html = render_dashboard(payload)
-    assert "<title>Lower Band Screener</title>" in html
-    assert 'id="payload"' in html
-    start = html.index('id="payload">') + len('id="payload">')
-    embedded = json.loads(html[start : html.index("</script>", start)])
+    html = render_dashboard(buy=payload, sell=None)
+    assert "<title>Band Screener</title>" in html
+    embedded = _embedded(html, "buy")
     assert embedded["as_of"] == payload["as_of"]
     assert len(embedded["rows"]) == len(payload["rows"])
+    assert _embedded(html, "sell") is None  # no sell data yet: the tab shows guidance instead
+
+
+def test_dashboard_embeds_both_tabs():
+    _, payload = demo_payload()
+    sell = dict(payload, side="upper")
+    html = render_dashboard(buy=payload, sell=sell)
+    assert _embedded(html, "sell")["side"] == "upper"
+    assert _embedded(html, "buy")["side"] == "lower"
 
 
 def test_write_outputs_creates_expected_files(tmp_path):

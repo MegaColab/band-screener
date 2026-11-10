@@ -9,6 +9,9 @@ week_lookback_days = 5     # trading days that make up "this week"
 band_mode = "live"         # "live": the unfinished quarter is the latest bar (like a chart today)
                            # "frozen": bands use completed quarters only
 
+[sell]
+proximity_threshold = 0.10 # Sell tab: a holding shows when its HIGH is within 10% below the upper band, or above it
+
 [liquidity]
 window_days = 60                  # average daily traded value over this many sessions
 min_avg_daily_value_us = 5000000  # USD. Stocks below this are flagged, never removed
@@ -23,7 +26,8 @@ min_success_ratio = 0.80   # abort the run (keep the old dashboard) if fewer tic
 asx200_file = "data/asx200.csv"
 asx200_max_age_days = 100      # warn on the dashboard when the ASX list is older than this
 sp500_cache_file = "data/sp500_cache.csv"
+holdings_file = "data/holdings.txt"  # tickers for the Sell tab (public: tickers only)
 
 [output]
 dir = "docs"
-keep_history = true        # write a small hits-only file per week to docs/data/history/
+keep_history = true        # write a small hits-only file per run to docs/data/history/
