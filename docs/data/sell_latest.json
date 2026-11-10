@@ -1,0 +1,25 @@
+{
+ "side": "upper",
+ "empty": true,
+ "generated_at": "2026-11-10 01:04 UTC",
+ "as_of": null,
+ "params": {
+  "threshold": 0.1,
+  "week_days": 5,
+  "bb_period": 20,
+  "bb_std": 2.0,
+  "band_mode": "live",
+  "liq_window": 60,
+  "liq_min_us": 5000000.0,
+  "liq_min_au": 1000000.0
+ },
+ "counts": {
+  "universe": 0,
+  "loaded": 0,
+  "by_status": {},
+  "by_market": {}
+ },
+ "warnings": [],
+ "asx_list": {},
+ "rows": []
+}
