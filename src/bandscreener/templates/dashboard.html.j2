@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>Lower Band Screener</title>
+{% raw %}<style>
+:root {
+  --bg: #f5f6f8; --card: #ffffff; --ink: #151a22; --muted: #5b6573; --line: #e2e6ec;
+  --accent: #1d5fd6; --warn: #8a5300; --warn-bg: #fff3dc; --chip: #edf0f5; --hit: #e8f0ff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0d1117; --card: #151b23; --ink: #e7ebf1; --muted: #97a1b0; --line: #262e39;
+    --accent: #79aaff; --warn: #f0b45c; --warn-bg: #2a2111; --chip: #1f2733; --hit: #172338;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink);
+  font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+.wrap { max-width: 980px; margin: 0 auto; padding: 20px 16px 48px; }
+h1 { font-size: 1.4rem; margin: 0 0 2px; }
+.sub, .asof { margin: 0; color: var(--muted); font-size: .88rem; }
+.asof { margin-top: 2px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-top: 14px; }
+.controls { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: center; }
+.controls label { font-size: .82rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { border: 0; background: transparent; color: var(--ink); padding: 7px 12px; font: inherit; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: var(--accent); color: #fff; }
+input[type=number], select { background: var(--card); color: var(--ink); border: 1px solid var(--line);
+  border-radius: 8px; padding: 6px 8px; font: inherit; }
+input[type=number] { width: 4.5em; }
+.notice { background: var(--warn-bg); color: var(--warn); border-radius: 10px; padding: 10px 12px;
+  margin-top: 12px; font-size: .88rem; }
+#summary { font-weight: 600; margin: 0 0 10px; }
+.tablewrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: right; padding: 9px 8px; border-bottom: 1px solid var(--line); vertical-align: top; white-space: nowrap; }
+th:first-child, td:first-child { text-align: left; white-space: normal; }
+th { font-size: .75rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; }
+th[data-sort] { cursor: pointer; }
+th[data-sort]:hover { color: var(--ink); }
+tbody tr:last-child td { border-bottom: 0; }
+.tk { font-weight: 700; }
+.mk { font-size: .72rem; color: var(--muted); margin-left: 6px; font-weight: 500; }
+.nm { display: block; font-size: .8rem; color: var(--muted); max-width: 22ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.chip { display: inline-block; font-size: .68rem; padding: 1px 7px; border-radius: 999px; background: var(--chip);
+  color: var(--muted); margin: 3px 4px 0 0; }
+.chip.below { background: var(--hit); color: var(--accent); font-weight: 600; }
+.gap { font-weight: 700; font-variant-numeric: tabular-nums; }
+.gap.neg { color: var(--accent); }
+.num { font-variant-numeric: tabular-nums; }
+.small { display: block; font-size: .75rem; color: var(--muted); }
+.empty { color: var(--muted); padding: 18px 4px; }
+details { margin-top: 12px; }
+summary { cursor: pointer; font-weight: 600; }
+details p { color: var(--muted); font-size: .85rem; margin: 6px 0; }
+.tags { display: flex; flex-wrap: wrap; gap: 4px 6px; margin-top: 8px; }
+.tags span { background: var(--chip); border-radius: 6px; padding: 2px 7px; font-size: .78rem; }
+footer { margin-top: 18px; color: var(--muted); font-size: .8rem; }
+footer p { margin: 6px 0; }
+@media (max-width: 560px) { .wrap { padding: 14px 10px 40px; } th, td { padding: 8px 5px; } .hide-sm { display: none; } }
+</style>{% endraw %}
+</head>
+<body>
+<div class="wrap">
+  <h1>Lower Band Screener</h1>
+  <p class="sub">S&amp;P 500 and ASX 200 &middot; quarterly Bollinger Bands</p>
+  <p class="asof">Prices to {{ payload.as_of }} &middot; built {{ payload.generated_at }}</p>
+
+  <div id="warnings"></div>
+
+  <div class="card">
+    <div class="controls">
+      <div class="seg" role="group" aria-label="Low window">
+        <button type="button" data-win="week" aria-pressed="true">Week low</button>
+        <button type="button" data-win="qtd" aria-pressed="false">Quarter-to-date low</button>
+      </div>
+      <label>Within <input id="thr" type="number" min="0" max="100" step="1" inputmode="decimal"> % of lower band</label>
+      <label>Market
+        <select id="mkt"><option value="ALL">All</option><option value="US">US</option><option value="ASX">ASX</option></select>
+      </label>
+      <label><input id="liq" type="checkbox"> Hide low-liquidity</label>
+    </div>
+  </div>
+
+  <div class="card">
+    <p id="summary"></p>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th data-sort="stock">Stock</th>
+            <th data-sort="gap" id="gaphead">Gap to band</th>
+            <th id="lowhead">Low</th>
+            <th>Lower band</th>
+            <th data-sort="close">Close</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div id="empty" class="empty" hidden>No stocks match these settings.</div>
+  </div>
+
+  <details class="card" id="negband"></details>
+  <details class="card" id="history"></details>
+  <details class="card" id="issues"></details>
+
+  <footer>
+    <p id="method"></p>
+    <p>Screening output only, not investment advice. Prices come from Yahoo Finance and can contain errors.</p>
+  </footer>
+</div>
+
+<script type="application/json" id="payload">{{ payload | tojson }}</script>
+{% raw %}<script>
+(function () {
+  "use strict";
+  var data = JSON.parse(document.getElementById("payload").textContent);
+  var rows = data.rows;
+  var ok = rows.filter(function (r) { return r.status === "ok"; });
+  var state = { win: "week", thr: Math.round(data.params.threshold * 1000) / 10, market: "ALL", hideLiq: false, sort: "gap", dir: 1 };
+
+  function $(s) { return document.querySelector(s); }
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function pct(x, d) {
+    if (x == null) return "–";
+    var sign = x > 0 ? "+" : (x < 0 ? "−" : "");
+    return sign + Math.abs(x * 100).toFixed(d == null ? 1 : d) + "%";
+  }
+  function price(x) { return x == null ? "–" : (x >= 1 ? x.toFixed(2) : x.toFixed(3)); }
+  function gapOf(r) { return state.win === "week" ? r.week_dist : r.qtd_dist; }
+  function lowOf(r) { return state.win === "week" ? r.week_low : r.qtd_low; }
+  function lowDateOf(r) { return state.win === "week" ? r.week_low_date : r.qtd_low_date; }
+
+  function matches() {
+    var t = state.thr / 100;
+    return ok.filter(function (r) {
+      var g = gapOf(r);
+      if (g == null || g > t) return false;
+      if (state.market !== "ALL" && r.market !== state.market) return false;
+      if (state.hideLiq && r.low_liquidity) return false;
+      return true;
+    });
+  }
+
+  function sortRows(list) {
+    var k = state.sort, d = state.dir;
+    list.sort(function (a, b) {
+      var x, y;
+      if (k === "stock") { x = a.ticker; y = b.ticker; return d * (x < y ? -1 : x > y ? 1 : 0); }
+      if (k === "close") { x = a.close_dist; y = b.close_dist; }
+      else { x = gapOf(a); y = gapOf(b); }
+      return d * (x - y);
+    });
+  }
+
+  function render() {
+    var t = state.thr / 100;
+    var list = matches();
+    sortRows(list);
+    var us = list.filter(function (r) { return r.market === "US"; }).length;
+    var asx = list.length - us;
+    var winName = state.win === "week" ? "this week's low" : "the quarter-to-date low";
+    $("#summary").textContent = list.length + " stock" + (list.length === 1 ? "" : "s") + " with " + winName +
+      " within " + state.thr + "% of the lower band (US " + us + ", ASX " + asx + ")";
+    $("#gaphead").textContent = state.win === "week" ? "Week low gap" : "QTD low gap";
+    $("#lowhead").textContent = state.win === "week" ? "Week low" : "QTD low";
+
+    $("#tbody").innerHTML = list.map(function (r) {
+      var g = gapOf(r);
+      var chips = "";
+      if (g < 0) chips += '<span class="chip below">broke below</span>';
+      if (g <= t && r.close_dist > t) chips += '<span class="chip">rallied since</span>';
+      if (r.low_liquidity) chips += '<span class="chip">low liquidity</span>';
+      return "<tr>" +
+        '<td><span class="tk">' + esc(r.ticker) + '</span><span class="mk">' + esc(r.market) + "</span>" +
+        '<span class="nm">' + esc(r.name) + "</span>" + chips + "</td>" +
+        '<td><span class="gap' + (g < 0 ? " neg" : "") + '">' + pct(g) + "</span></td>" +
+        '<td class="num" title="Low on ' + esc(lowDateOf(r)) + '">' + price(lowOf(r)) + "</td>" +
+        '<td class="num">' + price(r.lower) + "</td>" +
+        '<td class="num">' + price(r.close) + '<span class="small">' + pct(r.close_dist) + " vs band</span></td>" +
+        "</tr>";
+    }).join("");
+    $("#empty").hidden = list.length > 0;
+  }
+
+  function tagSection(sel, title, intro, items) {
+    var el = $(sel);
+    if (!items.length) { el.hidden = true; return; }
+    el.innerHTML = "<summary>" + esc(title) + " (" + items.length + ")</summary><p>" + esc(intro) + '</p><div class="tags">' +
+      items.map(function (t) { return "<span>" + esc(t) + "</span>"; }).join("") + "</div>";
+  }
+
+  function sections() {
+    var neg = rows.filter(function (r) { return r.status === "negative_band"; })
+      .map(function (r) { return r.ticker + " (" + r.market + ") band " + price(r.lower); });
+    tagSection("#negband", "Band not meaningful",
+      "The lower band is at or below zero, so any price would pass. Check these on a chart.", neg);
+
+    var hist = rows.filter(function (r) { return r.status === "insufficient_history"; })
+      .map(function (r) { return r.ticker + " (" + (r.bars || 0) + " qtrs)"; });
+    tagSection("#history", "Not enough history",
+      "Fewer than " + data.params.bb_period + " quarterly bars, so no band can be calculated.", hist);
+
+    var labels = { no_data: "no data", stale: "stale" };
+    var issues = rows.filter(function (r) { return r.status === "no_data" || r.status === "stale"; })
+      .map(function (r) { return r.ticker + " (" + r.market + ", " + labels[r.status] + (r.last_date ? " since " + r.last_date : "") + ")"; });
+    tagSection("#issues", "Data problems",
+      "Yahoo Finance returned nothing, or the last price is more than a week old.", issues);
+  }
+
+  function warnings() {
+    var box = $("#warnings");
+    var w = data.warnings.slice();
+    var c = data.counts;
+    if (c.loaded < c.universe) w.push(c.loaded + " of " + c.universe + " stocks loaded; see data problems below.");
+    box.innerHTML = w.map(function (m) { return '<div class="notice">' + esc(m) + "</div>"; }).join("");
+  }
+
+  function method() {
+    var p = data.params;
+    var asx = data.asx_list || {};
+    var text = "Bands: average of the last " + p.bb_period + " quarterly closes ± " + p.bb_std + " standard deviations, " +
+      (p.band_mode === "live" ? "including the unfinished quarter" : "completed quarters only") + ". " +
+      "Gap = (lowest daily low in the window − lower band) ÷ lower band. Week = last " + p.week_days + " trading days. " +
+      "Low liquidity = average daily value under " + (p.liq_min_us / 1e6) + "M USD / " + (p.liq_min_au / 1e6) + "M AUD over " + p.liq_window + " sessions (flagged, never removed).";
+    if (asx.as_of) text += " ASX 200 list as at " + asx.as_of + (asx.note ? " (" + asx.note + ")" : "") + ".";
+    $("#method").textContent = text;
+  }
+
+  document.querySelectorAll("[data-win]").forEach(function (b) {
+    b.addEventListener("click", function () {
+      state.win = b.getAttribute("data-win");
+      document.querySelectorAll("[data-win]").forEach(function (o) {
+        o.setAttribute("aria-pressed", o === b ? "true" : "false");
+      });
+      render();
+    });
+  });
+  $("#thr").value = state.thr;
+  $("#thr").addEventListener("input", function (e) {
+    var v = parseFloat(e.target.value);
+    state.thr = isNaN(v) ? 0 : v;
+    render();
+  });
+  $("#mkt").addEventListener("change", function (e) { state.market = e.target.value; render(); });
+  $("#liq").addEventListener("change", function (e) { state.hideLiq = e.target.checked; render(); });
+  document.querySelectorAll("th[data-sort]").forEach(function (th) {
+    th.addEventListener("click", function () {
+      var k = th.getAttribute("data-sort");
+      if (state.sort === k) state.dir = -state.dir; else { state.sort = k; state.dir = 1; }
+      render();
+    });
+  });
+
+  warnings();
+  sections();
+  method();
+  render();
+})();
+</script>{% endraw %}
+</body>
+</html>

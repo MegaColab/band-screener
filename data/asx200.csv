@@ -1,0 +1,207 @@
+# as_of: 2026-09-21
+# source: Kalkine/TradingView ASX 200 snapshot (2026-06-02), patched with S&P DJI ASX 200 changes effective 2026-06-22 and 2026-09-21
+# note: approximate list, not an official S&P snapshot. Replace this file after each quarterly rebalance (Mar, Jun, Sep, Dec).
+ticker,name
+360,LIFE360 Inc
+A2M,The a2 Milk Company Ltd
+AAI,Alcoa Corporation
+AFI,Australian Foundation Investment Company Ltd
+AGL,AGL Energy Ltd
+AIA,Auckland International Airport Ltd
+AIZ,Air New Zealand Ltd
+ALD,Ampol Ltd
+ALL,Aristocrat Leisure Ltd
+ALQ,Als Ltd
+ALX,Atlas Arteria
+AMC,Amcor Plc
+AMP,AMP Ltd
+ANN,Ansell Ltd
+ANZ,ANZ Group Holdings Ltd
+APA,APA Group
+APE,Eagers Automotive Ltd
+ARB,ARB Corporation Ltd
+ARG,Argo Investments Ltd
+ASB,Austal Ltd
+ASK,Abacus Storage King
+ASX,ASX Ltd
+AUB,AUB Group Ltd
+AZJ,Aurizon Holdings Ltd
+BAP,Bapcor Ltd
+BEN,Bendigo and Adelaide Bank Ltd
+BFL,BSP Financial Group Ltd
+BGA,Bega Cheese Ltd
+BHP,BHP Group Ltd
+BKW,Brickworks Ltd
+BOE,Boss Energy Ltd
+BOQ,Bank of Queensland Ltd
+BPT,Beach Energy Ltd
+BRG,Breville Group Ltd
+BSL,Bluescope Steel Ltd
+BWP,BWP Trust
+BXB,Brambles Ltd
+CAR,CAR Group Ltd
+CBA,Commonwealth Bank of Australia
+CDA,Codan Ltd
+CEN,Contact Energy Ltd
+CGF,Challenger Ltd
+CHC,Charter Hall Group
+CIA,Champion Iron Ltd
+CIP,Centuria Industrial REIT
+CLW,Charter Hall Long Wale REIT
+CMM,Capricorn Metals Ltd
+CNU,Chorus Ltd
+COH,Cochlear Ltd
+COL,Coles Group Ltd
+CPU,Computershare Ltd
+CQR,Charter Hall Retail REIT
+CSL,CSL Ltd
+CTD,Corporate Travel Management Ltd
+CWY,Cleanaway Waste Management Ltd
+DBI,Dalrymple Bay Infrastructure Ltd
+DGT,Digico Infrastructure REIT
+DHG,Domain Holdings Australia Ltd
+DMP,Dominos PIZZA Enterprises Ltd
+DNL,Dyno Nobel Ltd
+DOW,Downer Edi Ltd
+DRR,Deterra Royalties Ltd
+DXS,Dexus
+EBO,Ebos Group Ltd
+EDV,Endeavour Group Ltd
+ELS,Elsight Ltd
+ELV,Elevra Lithium Ltd
+EMR,Emerald Resources NL
+EOS,Electro Optic Systems Holdings Ltd
+EVN,Evolution Mining Ltd
+FBU,Fletcher Building Ltd
+FFM,FireFly Metals Ltd
+FLT,Flight Centre Travel Group Ltd
+FMG,Fortescue Ltd
+FPH,Fisher & Paykel Healthcare Corporation Ltd
+FRW,Freightways Group Ltd
+GDG,Generation Development Group Ltd
+GMD,Genesis Minerals Ltd
+GMG,Goodman Group
+GNE,Genesis Energy Ltd
+GOR,Gold Road Resources Ltd
+GOZ,Growthpoint Properties Australia
+GPT,GPT Group
+HDN,Homeco Daily Needs REIT
+HMC,HMC Capital Ltd
+HUB,HUB24 Ltd
+HVN,Harvey Norman Holdings Ltd
+IAG,Insurance Australia Group Ltd
+IFL,Insignia Financial Ltd
+IFT,Infratil Ltd
+IGO,IGO Ltd
+ILU,Iluka Resources Ltd
+INA,Ingenia Communities Group
+JBH,JB Hi-Fi Ltd
+JHX,James Hardie Industries Plc
+KCN,Kingsgate Consolidated Ltd
+LLC,Lendlease Group
+LNW,Light & Wonder Inc
+LOV,Lovisa Holdings Ltd
+LSF,L1 Long Short Fund Ltd
+LTR,Liontown Resources Ltd
+LYC,Lynas Rare EARTHS Ltd
+MAQ,Macquarie Technology Group Ltd
+MCY,Mercury NZ Ltd
+MEZ,Meridian Energy Ltd
+MFF,MFF Capital Investments Ltd
+MGR,Mirvac Group
+MI6,Minerals 260 Ltd
+MIN,Mineral Resources Ltd
+MND,Monadelphous Group Ltd
+MP1,Megaport Ltd
+MPL,Medibank Private Ltd
+MQG,Macquarie Group Ltd
+MSB,Mesoblast Ltd
+MTS,Metcash Ltd
+MXT,Metrics Master Income Trust
+NAB,National Australia Bank Ltd
+NEC,Nine Entertainment Co. Holdings Ltd
+NEM,Newmont Corporation
+NHC,New Hope Corporation Ltd
+NHF,NIB Holdings Ltd
+NIC,Nickel Industries Ltd
+NSR,National Storage REIT
+NST,Northern Star Resources Ltd
+NWL,Netwealth Group Ltd
+NWS,News Corporation
+NXT,NEXTDC Ltd
+OBM,Ora Banda Mining Ltd
+OCL,Objective Corporation Ltd
+ORA,Orora Ltd
+ORG,Origin Energy Ltd
+ORI,Orica Ltd
+PDN,Paladin Energy Ltd
+PLS,Pilbara Minerals Ltd
+PME,Pro Medicus Ltd
+PMV,Premier Investments Ltd
+PNI,Pinnacle Investment Management Group Ltd
+PPT,Perpetual Ltd
+PRU,Perseus Mining Ltd
+PXA,Pexa Group Ltd
+QAN,Qantas Airways Ltd
+QBE,QBE Insurance Group Ltd
+QUB,QUBE Holdings Ltd
+REA,REA Group Ltd
+REG,Regis Healthcare Ltd
+REH,Reece Ltd
+RGN,Region Group
+RHC,Ramsay Health Care Ltd
+RIO,RIO Tinto Ltd
+RMD,Resmed Inc
+RMS,Ramelius Resources Ltd
+RRL,Regis Resources Ltd
+RWC,Reliance Worldwide Corporation Ltd
+S32,SOUTH32 Ltd
+SCG,Scentre Group
+SDF,Steadfast Group Ltd
+SEK,Seek Ltd
+SFR,Sandfire Resources Ltd
+SGH,SGH Ltd
+SGM,Sims Ltd
+SGP,Stockland
+SHL,Sonic Healthcare Ltd
+SIG,Sigma Healthcare Ltd
+SIQ,Smartgroup Corporation Ltd
+SMR,Stanmore Resources Ltd
+SNL,Supply Network Ltd
+SNZ,Summerset Group Holdings Ltd
+SOL,Washington H Soul Pattinson & Company Ltd
+SPK,Spark New Zealand Ltd
+SPR,Spartan Resources Ltd
+SRL,Sunrise Energy Metals Ltd
+SSM,Service Stream Ltd
+STO,Santos Ltd
+SUL,Super Retail Group Ltd
+SUN,Suncorp Group Ltd
+TCL,Transurban Group
+TLC,The Lottery Corporation Ltd
+TLS,Telstra Group Ltd
+TLX,TELIX Pharmaceuticals Ltd
+TNE,Technology One Ltd
+TPG,TPG Telecom Ltd
+TWE,Treasury Wine Estates Ltd
+VAU,Vault Minerals Ltd
+VCX,Vicinity Centres
+VEA,Viva Energy Group Ltd
+VNT,Ventia Services Group Ltd
+WAF,West African Resources Ltd
+WAM,WAM Capital Ltd
+WBC,Westpac Banking Corporation
+WBT,Weebit Nano Ltd
+WDS,Woodside Energy Group Ltd
+WES,Wesfarmers Ltd
+WGX,Westgold Resources Ltd
+WHC,Whitehaven Coal Ltd
+WLE,Wam Leaders Ltd
+WOR,Worley Ltd
+WOW,Woolworths Group Ltd
+WPR,Waypoint REIT
+WTC,Wisetech Global Ltd
+XRO,Xero Ltd
+XYZ,"Block, Inc"
+YAL,Yancoal Australia Ltd
+ZIP,ZIP Co Ltd
