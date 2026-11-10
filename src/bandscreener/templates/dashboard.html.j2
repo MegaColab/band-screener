@@ -14,7 +14,12 @@
         <label>Market
           <select data-role="mkt"><option value="ALL">All</option><option value="US">US</option><option value="ASX">ASX</option></select>
         </label>
+        <label data-role="typewrap" hidden>Type
+          <select data-role="typ"><option value="ALL">All</option><option value="STOCK">Stocks only</option><option value="ETF">ETFs only</option></select>
+        </label>
         <label><input data-role="liq" type="checkbox"> Hide low-liquidity</label>
+        <label data-role="newwrap" hidden><input data-role="newonly" type="checkbox"> New only</label>
+        <label><input data-role="all" type="checkbox"> Show all (ignore threshold)</label>
       </div>
     </div>
 
@@ -189,10 +194,14 @@ footer p { margin: 6px 0; }
     var ok = rows.filter(function (r) { return r.status === "ok"; });
     var state = {
       win: "week", thr: Math.round(data.params.threshold * 1000) / 10,
-      market: "ALL", hideLiq: false, sort: "gap", dir: upper ? -1 : 1
+      market: "ALL", type: "ALL", hideLiq: false, newOnly: false, showAll: false,
+      sort: "gap", dir: upper ? -1 : 1
     };
+    var hasEtf = ok.some(function (r) { return r.is_etf; });
+    var hasNew = !!data.prev_as_of;
 
     function gapOf(r) { return state.win === "week" ? r.week_dist : r.qtd_dist; }
+    function isNew(r) { return !!(state.win === "week" ? r.week_new : r.qtd_new); }
     function edgeOf(r) {
       if (upper) return state.win === "week" ? r.week_high : r.qtd_high;
       return state.win === "week" ? r.week_low : r.qtd_low;
@@ -225,21 +234,31 @@ footer p { margin: 6px 0; }
       var t = state.thr / 100;
       var list = ok.filter(function (r) {
         var g = gapOf(r);
-        if (g == null || !passes(g, t)) return false;
+        if (g == null) return false;
+        if (!state.showAll && !passes(g, t)) return false;
         if (state.market !== "ALL" && r.market !== state.market) return false;
+        if (state.type === "ETF" && !r.is_etf) return false;
+        if (state.type === "STOCK" && r.is_etf) return false;
         if (state.hideLiq && r.low_liquidity) return false;
+        if (state.newOnly && !isNew(r)) return false;
         return true;
       });
       sortRows(list);
 
       var us = list.filter(function (r) { return r.market === "US"; }).length;
       var asx = list.length - us;
+      var inZone = list.filter(function (r) { return passes(gapOf(r), t); }).length;
+      var newCount = list.filter(isNew).length;
       var what = (upper ? (state.win === "week" ? "this week's high" : "the quarter-to-date high")
                         : (state.win === "week" ? "this week's low" : "the quarter-to-date low"));
       var rel = upper ? "within " + state.thr + "% below the upper band, or above it"
                       : "within " + state.thr + "% of the lower band";
-      $("summary").textContent = list.length + " stock" + (list.length === 1 ? "" : "s") + " with " + what +
-        " " + rel + " (US " + us + ", ASX " + asx + ")";
+      var text = state.showAll
+        ? list.length + " stock" + (list.length === 1 ? "" : "s") + " shown, closest to the " + (upper ? "upper" : "lower") +
+          " band first; " + inZone + " with " + what + " " + rel + " (US " + us + ", ASX " + asx + ")"
+        : list.length + " stock" + (list.length === 1 ? "" : "s") + " with " + what + " " + rel + " (US " + us + ", ASX " + asx + ")";
+      if (hasNew) text += "; " + newCount + " new since " + data.prev_as_of;
+      $("summary").textContent = text;
       $("gaphead").textContent = (state.win === "week" ? "Week" : "QTD") + (upper ? " high gap" : " low gap");
       $("edgehead").textContent = state.win === "week" ? (upper ? "Week high" : "Week low") : (upper ? "QTD high" : "QTD low");
       if (badge) badge.textContent = list.length;
@@ -254,6 +273,9 @@ footer p { margin: 6px 0; }
           if (g < 0) chips += '<span class="chip hit">broke below</span>';
           if (g <= t && r.close_dist > t) chips += '<span class="chip">rallied since</span>';
         }
+        if (isNew(r)) chips += '<span class="chip hit">new</span>';
+        if (r.is_etf) chips += '<span class="chip">ETF</span>';
+        if (state.showAll && !passes(g, t)) chips += '<span class="chip">outside zone</span>';
         if (r.low_liquidity) chips += '<span class="chip">low liquidity</span>';
         var emphasised = upper ? g >= 0 : g < 0;
         return "<tr>" +
@@ -329,6 +351,11 @@ footer p { margin: 6px 0; }
     });
     $("mkt").addEventListener("change", function (e) { state.market = e.target.value; render(); });
     $("liq").addEventListener("change", function (e) { state.hideLiq = e.target.checked; render(); });
+    $("typewrap").hidden = !hasEtf;  // the Type filter only appears when some listed stock is an ETF
+    $("newwrap").hidden = !hasNew;   // "New only" only appears once there is an earlier run to compare with
+    $("typ").addEventListener("change", function (e) { state.type = e.target.value; render(); });
+    $("newonly").addEventListener("change", function (e) { state.newOnly = e.target.checked; render(); });
+    $("all").addEventListener("change", function (e) { state.showAll = e.target.checked; render(); });
     root.querySelectorAll("th[data-sort]").forEach(function (th) {
       th.addEventListener("click", function () {
         var k = th.getAttribute("data-sort");

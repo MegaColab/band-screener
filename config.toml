@@ -27,6 +27,7 @@ asx200_file = "data/asx200.csv"
 asx200_max_age_days = 100      # warn on the dashboard when the ASX list is older than this
 sp500_cache_file = "data/sp500_cache.csv"
 holdings_file = "data/holdings.txt"  # tickers for the Sell tab (public: tickers only)
+etf_file = "data/etfs.txt"           # tickers to tag as ETFs, for the Type filter on both tabs
 
 [output]
 dir = "docs"

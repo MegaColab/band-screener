@@ -11,8 +11,9 @@ import sys
 from pathlib import Path
 
 from .config import load_config
-from .pipeline import build_empty_payload, build_payload
-from .report import write_outputs
+from .pipeline import build_empty_payload, build_payload, mark_new
+from .report import read_previous_snapshot, write_outputs
+from .universe import load_etfs
 
 
 def _finish(cfg, args, universe, prices, warnings, asx_meta, side: str, out_dir: Path) -> int:
@@ -25,7 +26,8 @@ def _finish(cfg, args, universe, prices, warnings, asx_meta, side: str, out_dir:
         )
         return 2
 
-    payload = build_payload(cfg, universe, prices, warnings, asx_meta, side=side)
+    payload = build_payload(cfg, universe, prices, warnings, asx_meta, side=side, etfs=load_etfs(cfg.etf_file))
+    mark_new(payload, read_previous_snapshot(out_dir, side, payload["as_of"]))
     written = write_outputs(payload, out_dir, cfg.keep_history)
 
     counts = payload["counts"]

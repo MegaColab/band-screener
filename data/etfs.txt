@@ -1,0 +1,18 @@
+# Tickers to tag as ETFs. They get an "ETF" chip, and the Type filter on both tabs can show
+# ETFs only or plain stocks only. Same format as holdings.txt: one per line, or comma separated.
+#
+# TICKERS ONLY. This file is public.
+
+ASX:ETPMAG
+ASX:VHY
+ASX:A200
+ASX:VAS
+ASX:VTS
+ASX:IVV
+ASX:VEU
+ASX:U100
+ASX:NDQ
+ASX:URNM
+NYSEARCA:BAI
+BATS:DRAM
+NASDAQ:SOXX

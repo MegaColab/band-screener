@@ -188,6 +188,17 @@ def _holding_row(token: str) -> dict | None:
             "currency": "USD", "sector": ""}
 
 
+def load_etfs(path: Path | None) -> set[tuple[str, str]]:
+    """Tickers to tag as ETFs, as (market, ticker) pairs. Same file format as the holdings list.
+
+    A missing or empty file means no ETFs, so every stock counts as a plain stock.
+    """
+    if path is None or not Path(path).exists():
+        return set()
+    rows, _ = parse_holdings(Path(path).read_text(encoding="utf-8"))
+    return {(r["market"], r["ticker"]) for r in rows}
+
+
 def load_holdings(path: Path) -> tuple[list[dict], list[str]]:
     """Read the holdings file. Returns (rows, warnings). A missing or empty file gives no rows."""
     if not path.exists():

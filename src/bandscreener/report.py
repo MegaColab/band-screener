@@ -7,6 +7,7 @@ daily holdings watch), so each run re-reads the other tab's latest data file fro
 from __future__ import annotations
 
 import json
+from datetime import date
 from pathlib import Path
 
 from jinja2 import Environment, FileSystemLoader
@@ -38,6 +39,31 @@ def read_latest(out_dir: Path, side: str) -> dict | None:
         return None
     try:
         return json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+
+
+def read_previous_snapshot(out_dir: Path, side: str, as_of: str | None) -> dict | None:
+    """The most recent history snapshot for one tab from a run before ``as_of``, or None."""
+    if not as_of:
+        return None
+    hist_dir = Path(out_dir) / "data" / "history"
+    if not hist_dir.exists():
+        return None
+    prefix = FILES[side][1]
+    best: tuple[str, Path] | None = None
+    for path in hist_dir.glob(f"{prefix}*.json"):
+        stem = path.stem[len(prefix):]
+        try:
+            date.fromisoformat(stem)  # skips the other tab's files, whose names carry a prefix
+        except ValueError:
+            continue
+        if stem < as_of and (best is None or stem > best[0]):
+            best = (stem, path)
+    if best is None:
+        return None
+    try:
+        return json.loads(best[1].read_text(encoding="utf-8"))
     except (OSError, ValueError):
         return None
 

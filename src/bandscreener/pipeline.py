@@ -59,6 +59,7 @@ def build_payload(
     asx_meta: dict | None = None,
     generated_at: datetime | None = None,
     side: str = "lower",
+    etfs: set[tuple[str, str]] | None = None,
 ) -> dict:
     if not prices:
         raise RuntimeError("No price data was loaded.")
@@ -77,6 +78,7 @@ def build_payload(
         min_adv = cfg.liq_min_us if stock["currency"] == "USD" else cfg.liq_min_au
         adv = result.get("adv")
         row["low_liquidity"] = bool(adv is not None and adv < min_adv)
+        row["is_etf"] = (stock["market"], stock["ticker"]) in (etfs or set())
         rows.append(_clean(row))
 
     loaded = sum(1 for s in universe if s["yahoo"] in prices)
@@ -96,6 +98,38 @@ def build_payload(
         "asx_list": asx_meta or {},
         "rows": rows,
     }
+
+
+def mark_new(payload: dict, previous: dict | None) -> None:
+    """Tag stocks that are in the zone now but were not in the previous run's hit list.
+
+    ``previous`` is the previous run's history snapshot for the same tab (see ``history_snapshot``).
+    Each window is compared on its own: ``week_new`` and ``qtd_new``. With no previous snapshot
+    nothing is tagged, so the first run does not claim that everything is new.
+    """
+    payload["prev_as_of"] = None
+    if not previous or not previous.get("as_of"):
+        return
+
+    upper = payload.get("side") == "upper"
+    thr = previous.get("params", {}).get("threshold", payload["params"]["threshold"])
+
+    def in_zone(dist) -> bool:
+        if dist is None:
+            return False
+        return dist >= -thr if upper else dist <= thr
+
+    before = {
+        (h["market"], h["ticker"]): (in_zone(h.get("week_dist")), in_zone(h.get("qtd_dist")))
+        for h in previous.get("hits", [])
+    }
+    payload["prev_as_of"] = previous["as_of"]
+    for row in payload["rows"]:
+        if row.get("status") != "ok":
+            continue
+        was_week, was_qtd = before.get((row["market"], row["ticker"]), (False, False))
+        row["week_new"] = bool(row.get("week_hit")) and not was_week
+        row["qtd_new"] = bool(row.get("qtd_hit")) and not was_qtd
 
 
 def build_empty_payload(cfg: Config, side: str, warnings: list[str], generated_at: datetime | None = None) -> dict:

@@ -33,6 +33,12 @@ Lines starting with `#` are comments. Entries that cannot be read (for example a
 
 **Public repo warning:** the repository and the dashboard are public, so the tickers in `data/holdings.txt` are visible to anyone. Keep to tickers only. Never add quantities, prices, account names or notes about positions. If the tickers alone are too revealing, rename the tab in the page template (for example to "Watchlist") or make the repository private (Pages then needs a paid plan).
 
+## Filters and tags on both tabs
+
+- **Show all (ignore threshold):** lists every stock with a band, sorted by how close it is to the band, with an "outside zone" tag on those beyond the threshold. Use it to see which stocks are approaching the zone.
+- **New tag and "New only":** a stock gets a "new" tag when it is in the zone now but was not in the previous run's list. Each window (week, quarter-to-date) is compared on its own. The comparison uses the files in `docs/data/history/`, so the first run after a fresh start tags nothing. The "New only" box appears once a previous run exists.
+- **Type filter (All / Stocks only / ETFs only):** driven by `data/etfs.txt`, a list of tickers in the same format as `data/holdings.txt`. Those stocks get an "ETF" tag. The Type box appears on a tab only when at least one stock on it is listed there. The Buy universe (S&P 500 and ASX 200 members) holds no ETFs, so the box normally shows on the Sell tab only.
+
 ## One-time setup
 
 1. In the repo, go to **Settings → Pages**. Under "Build and deployment", set **Source** to *Deploy from a branch*, branch **main**, folder **/docs**, then Save.
@@ -53,6 +59,7 @@ After that the Buy tab refreshes weekly and the Sell tab daily. Both can be run 
 | `min_success_ratio` | 0.80 | If fewer stocks than this load, the run stops and the old dashboard stays |
 | `[sell] proximity_threshold` | 0.10 | Same idea for the Sell tab: high within 10% below the upper band, or above it |
 | `holdings_file` | `data/holdings.txt` | Where the Sell tab reads your tickers |
+| `etf_file` | `data/etfs.txt` | Which tickers are tagged ETF (for the Type filter) |
 
 ## Keeping the ASX 200 list current
 
@@ -72,6 +79,7 @@ The current file is **approximate**: it was built from a third-party snapshot pa
 | `config.toml` | All settings |
 | `tests/` | Automated tests, run before every weekly screen |
 | `data/holdings.txt` | Your tickers for the Sell tab (you edit this) |
+| `data/etfs.txt` | Tickers to tag as ETFs, for the Type filter (you edit this; tickers only) |
 | `.github/workflows/` | `weekly.yml` (Buy) and `daily-sell.yml` (Sell) |
 | `docs/` | Published dashboard and data (written by the workflows) |
 

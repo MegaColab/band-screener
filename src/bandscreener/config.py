@@ -26,6 +26,7 @@ class Config:
     holdings_file: Path
     out_dir: Path
     keep_history: bool
+    etf_file: Path | None = None  # tickers listed here are tagged ETF (drives the ETF filter)
 
 
 def load_config(path: str | Path = "config.toml") -> Config:
@@ -74,4 +75,5 @@ def load_config(path: str | Path = "config.toml") -> Config:
         holdings_file=root / uni.get("holdings_file", "data/holdings.txt"),
         out_dir=root / out.get("dir", "docs"),
         keep_history=bool(out.get("keep_history", True)),
+        etf_file=root / uni.get("etf_file", "data/etfs.txt"),
     )
