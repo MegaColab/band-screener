@@ -49,12 +49,12 @@ def _split_download(raw: pd.DataFrame, symbols: list[str]) -> dict[str, pd.DataF
     return frames
 
 
-def _download(yf, symbols: list[str], years: int, retries: int) -> dict[str, pd.DataFrame]:
+def _download(yf, symbols: list[str], start_date: str, retries: int) -> dict[str, pd.DataFrame]:
     for attempt in range(retries + 1):
         try:
             raw = yf.download(
                 symbols,
-                period=f"{years}y",
+                start=start_date,  # Yahoo only accepts fixed periods (5y, 10y...), so use a start date
                 interval="1d",
                 auto_adjust=False,  # Close is split-adjusted but not dividend-adjusted, like most charts
                 group_by="ticker",
@@ -74,15 +74,16 @@ def download_prices(
     """Daily OHLCV per Yahoo symbol. Symbols with no usable data are left out."""
     import yfinance as yf
 
+    start_date = (pd.Timestamp.today().normalize() - pd.DateOffset(years=years)).strftime("%Y-%m-%d")
     prices: dict[str, pd.DataFrame] = {}
-    for start in range(0, len(symbols), batch_size):
-        batch = symbols[start : start + batch_size]
-        got = _download(yf, batch, years, retries)
+    for first in range(0, len(symbols), batch_size):
+        batch = symbols[first : first + batch_size]
+        got = _download(yf, batch, start_date, retries)
         missing = [s for s in batch if s not in got]
         if missing:  # one more try for anything the batch dropped (rate limits are common)
             time.sleep(2)
-            got.update(_download(yf, missing, years, retries=1))
+            got.update(_download(yf, missing, start_date, retries=1))
         prices.update(got)
-        print(f"  prices: {len(prices)} of {min(start + batch_size, len(symbols))} loaded", file=sys.stderr)
+        print(f"  prices: {len(prices)} of {min(first + batch_size, len(symbols))} loaded", file=sys.stderr)
         time.sleep(pause)
     return prices
