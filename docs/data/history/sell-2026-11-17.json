@@ -1,0 +1,280 @@
+{
+ "as_of": "2026-11-17",
+ "generated_at": "2026-11-17 00:02 UTC",
+ "params": {
+  "threshold": 0.1,
+  "week_days": 5,
+  "bb_period": 20,
+  "bb_std": 2.0,
+  "band_mode": "live",
+  "liq_window": 60,
+  "liq_min_us": 5000000.0,
+  "liq_min_au": 1000000.0,
+  "rsi_period": 14,
+  "rsi_oversold": 30.0,
+  "rsi_overbought": 70.0
+ },
+ "hits": [
+  {
+   "ticker": "NVDA",
+   "market": "US",
+   "week_high": 177.53999,
+   "upper": 244.41642,
+   "week_dist": -0.27362,
+   "qtd_dist": -0.00428,
+   "close_dist": -0.36117
+  },
+  {
+   "ticker": "KCN",
+   "market": "ASX",
+   "week_high": 4.495,
+   "upper": 5.40601,
+   "week_dist": -0.16852,
+   "qtd_dist": -0.0825,
+   "close_dist": -0.26471
+  },
+  {
+   "ticker": "FGX",
+   "market": "ASX",
+   "week_high": 1.335,
+   "upper": 1.39691,
+   "week_dist": -0.04432,
+   "qtd_dist": -0.00494,
+   "close_dist": -0.06937
+  },
+  {
+   "ticker": "FUEL",
+   "market": "ASX",
+   "week_high": 9.22,
+   "upper": 8.8982,
+   "week_dist": 0.03616,
+   "qtd_dist": 0.11258,
+   "close_dist": 0.01481
+  },
+  {
+   "ticker": "MFF",
+   "market": "ASX",
+   "week_high": 5.33,
+   "upper": 5.92371,
+   "week_dist": -0.10023,
+   "qtd_dist": -0.0749,
+   "close_dist": -0.12724
+  },
+  {
+   "ticker": "GOOG",
+   "market": "US",
+   "week_high": 301.62,
+   "upper": 352.98957,
+   "week_dist": -0.14553,
+   "qtd_dist": 0.0064,
+   "close_dist": -0.20321
+  },
+  {
+   "ticker": "NST",
+   "market": "ASX",
+   "week_high": 26.73,
+   "upper": 27.33186,
+   "week_dist": -0.02202,
+   "qtd_dist": -0.02202,
+   "close_dist": -0.10434
+  },
+  {
+   "ticker": "TCL",
+   "market": "ASX",
+   "week_high": 15.27,
+   "upper": 15.03779,
+   "week_dist": 0.01544,
+   "qtd_dist": 0.01544,
+   "close_dist": 0.00879
+  },
+  {
+   "ticker": "VHY",
+   "market": "ASX",
+   "week_high": 86.89,
+   "upper": 87.3656,
+   "week_dist": -0.00544,
+   "qtd_dist": -0.00544,
+   "close_dist": -0.0257
+  },
+  {
+   "ticker": "SOL",
+   "market": "ASX",
+   "week_high": 49.04,
+   "upper": 48.55001,
+   "week_dist": 0.01009,
+   "qtd_dist": 0.01009,
+   "close_dist": -0.01401
+  },
+  {
+   "ticker": "A200",
+   "market": "ASX",
+   "week_high": 153.19,
+   "upper": 157.831,
+   "week_dist": -0.0294,
+   "qtd_dist": -0.02915,
+   "close_dist": -0.05291
+  },
+  {
+   "ticker": "VAS",
+   "market": "ASX",
+   "week_high": 113.45,
+   "upper": 117.14256,
+   "week_dist": -0.03152,
+   "qtd_dist": -0.0311,
+   "close_dist": -0.05508
+  },
+  {
+   "ticker": "IVV",
+   "market": "ASX",
+   "week_high": 74.6,
+   "upper": 79.63181,
+   "week_dist": -0.06319,
+   "qtd_dist": -0.06243,
+   "close_dist": -0.08027
+  },
+  {
+   "ticker": "VEU",
+   "market": "ASX",
+   "week_high": 119.9,
+   "upper": 125.42564,
+   "week_dist": -0.04406,
+   "qtd_dist": -0.03839,
+   "close_dist": -0.06024
+  },
+  {
+   "ticker": "NAB",
+   "market": "ASX",
+   "week_high": 39.5,
+   "upper": 45.19737,
+   "week_dist": -0.12606,
+   "qtd_dist": -0.07229,
+   "close_dist": -0.16123
+  },
+  {
+   "ticker": "NDQ",
+   "market": "ASX",
+   "week_high": 60.89,
+   "upper": 67.66964,
+   "week_dist": -0.10019,
+   "qtd_dist": -0.03679,
+   "close_dist": -0.13462
+  },
+  {
+   "ticker": "SOXX",
+   "market": "US",
+   "week_high": 158.58,
+   "upper": 177.54735,
+   "week_dist": -0.10683,
+   "qtd_dist": 0.11978,
+   "close_dist": -0.20461
+  },
+  {
+   "ticker": "RKLB",
+   "market": "US",
+   "week_high": 68.26,
+   "upper": 86.2986,
+   "week_dist": -0.20903,
+   "qtd_dist": -0.09292,
+   "close_dist": -0.33522
+  },
+  {
+   "ticker": "MSFT",
+   "market": "US",
+   "week_high": 544.19,
+   "upper": 568.37837,
+   "week_dist": -0.04256,
+   "qtd_dist": -0.01624,
+   "close_dist": -0.08865
+  },
+  {
+   "ticker": "TLS",
+   "market": "ASX",
+   "week_high": 5.17,
+   "upper": 5.36457,
+   "week_dist": -0.03627,
+   "qtd_dist": -0.03627,
+   "close_dist": -0.04
+  },
+  {
+   "ticker": "QBE",
+   "market": "ASX",
+   "week_high": 26.96,
+   "upper": 27.06997,
+   "week_dist": -0.00406,
+   "qtd_dist": -0.00406,
+   "close_dist": -0.01034
+  },
+  {
+   "ticker": "VCX",
+   "market": "ASX",
+   "week_high": 2.5,
+   "upper": 2.70576,
+   "week_dist": -0.07604,
+   "qtd_dist": -0.06126,
+   "close_dist": -0.08159
+  },
+  {
+   "ticker": "GPT",
+   "market": "ASX",
+   "week_high": 5.22,
+   "upper": 5.50386,
+   "week_dist": -0.05158,
+   "qtd_dist": -0.05158,
+   "close_dist": -0.0652
+  },
+  {
+   "ticker": "MAH",
+   "market": "ASX",
+   "week_high": 1.0,
+   "upper": 0.98774,
+   "week_dist": 0.01241,
+   "qtd_dist": 0.17945,
+   "close_dist": -0.08681
+  },
+  {
+   "ticker": "SHA",
+   "market": "ASX",
+   "week_high": 7.42,
+   "upper": 7.8434,
+   "week_dist": -0.05398,
+   "qtd_dist": 0.06969,
+   "close_dist": -0.06801
+  },
+  {
+   "ticker": "SFR",
+   "market": "ASX",
+   "week_high": 20.86,
+   "upper": 21.25108,
+   "week_dist": -0.0184,
+   "qtd_dist": 0.08865,
+   "close_dist": -0.15063
+  },
+  {
+   "ticker": "BFG",
+   "market": "ASX",
+   "week_high": 1.435,
+   "upper": 1.56059,
+   "week_dist": -0.08048,
+   "qtd_dist": -0.07086,
+   "close_dist": -0.0997
+  },
+  {
+   "ticker": "S32",
+   "market": "ASX",
+   "week_high": 4.71,
+   "upper": 4.99092,
+   "week_dist": -0.05629,
+   "qtd_dist": 0.01685,
+   "close_dist": -0.12741
+  },
+  {
+   "ticker": "BSL",
+   "market": "ASX",
+   "week_high": 33.6,
+   "upper": 31.80533,
+   "week_dist": 0.05643,
+   "qtd_dist": 0.07844,
+   "close_dist": 0.02121
+  }
+ ]
+}
