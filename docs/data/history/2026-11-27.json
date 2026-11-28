@@ -1,0 +1,748 @@
+{
+ "as_of": "2026-11-27",
+ "generated_at": "2026-11-28 00:07 UTC",
+ "params": {
+  "threshold": 0.1,
+  "week_days": 5,
+  "bb_period": 20,
+  "bb_std": 2.0,
+  "band_mode": "live",
+  "liq_window": 60,
+  "liq_min_us": 5000000.0,
+  "liq_min_au": 1000000.0,
+  "rsi_period": 14,
+  "rsi_oversold": 30.0,
+  "rsi_overbought": 70.0
+ },
+ "hits": [
+  {
+   "ticker": "AMT",
+   "market": "US",
+   "week_low": 178.21001,
+   "lower": 147.56858,
+   "week_dist": 0.20764,
+   "qtd_dist": 0.08627,
+   "close_dist": 0.25318
+  },
+  {
+   "ticker": "AWK",
+   "market": "US",
+   "week_low": 145.63,
+   "lower": 115.92707,
+   "week_dist": 0.25622,
+   "qtd_dist": 0.08982,
+   "close_dist": 0.32635
+  },
+  {
+   "ticker": "AON",
+   "market": "US",
+   "week_low": 327.04001,
+   "lower": 258.80954,
+   "week_dist": 0.26363,
+   "qtd_dist": 0.02906,
+   "close_dist": 0.34628
+  },
+  {
+   "ticker": "APTV",
+   "market": "US",
+   "week_low": 35.14,
+   "lower": 37.18569,
+   "week_dist": -0.05501,
+   "qtd_dist": -0.05501,
+   "close_dist": 0.02432
+  },
+  {
+   "ticker": "CHTR",
+   "market": "US",
+   "week_low": 124.85,
+   "lower": 100.07573,
+   "week_dist": 0.24756,
+   "qtd_dist": 0.01033,
+   "close_dist": 0.53754
+  },
+  {
+   "ticker": "CLX",
+   "market": "US",
+   "week_low": 101.57,
+   "lower": 85.64102,
+   "week_dist": 0.186,
+   "qtd_dist": -0.07614,
+   "close_dist": 0.29914
+  },
+  {
+   "ticker": "CMCSA",
+   "market": "US",
+   "week_low": 24.29,
+   "lower": 21.57584,
+   "week_dist": 0.1258,
+   "qtd_dist": -0.05079,
+   "close_dist": 0.20876
+  },
+  {
+   "ticker": "STZ",
+   "market": "US",
+   "week_low": 136.2,
+   "lower": 102.84743,
+   "week_dist": 0.32429,
+   "qtd_dist": 0.07538,
+   "close_dist": 0.37077
+  },
+  {
+   "ticker": "COO",
+   "market": "US",
+   "week_low": 58.66,
+   "lower": 53.99701,
+   "week_dist": 0.08636,
+   "qtd_dist": -0.00532,
+   "close_dist": 0.1534
+  },
+  {
+   "ticker": "CSGP",
+   "market": "US",
+   "week_low": 28.64,
+   "lower": 28.81917,
+   "week_dist": -0.00622,
+   "qtd_dist": -0.06798,
+   "close_dist": 0.21169
+  },
+  {
+   "ticker": "DPZ",
+   "market": "US",
+   "week_low": 346.5,
+   "lower": 269.55269,
+   "week_dist": 0.28546,
+   "qtd_dist": 0.04989,
+   "close_dist": 0.32924
+  },
+  {
+   "ticker": "EIX",
+   "market": "US",
+   "week_low": 61.48,
+   "lower": 48.73026,
+   "week_dist": 0.26164,
+   "qtd_dist": 0.05745,
+   "close_dist": 0.30371
+  },
+  {
+   "ticker": "EFX",
+   "market": "US",
+   "week_low": 176.89,
+   "lower": 135.72001,
+   "week_dist": 0.30334,
+   "qtd_dist": 0.00995,
+   "close_dist": 0.36642
+  },
+  {
+   "ticker": "FIS",
+   "market": "US",
+   "week_low": 25.8,
+   "lower": 28.12602,
+   "week_dist": -0.0827,
+   "qtd_dist": -0.08803,
+   "close_dist": 0.00299
+  },
+  {
+   "ticker": "HSY",
+   "market": "US",
+   "week_low": 171.66,
+   "lower": 144.40702,
+   "week_dist": 0.18872,
+   "qtd_dist": 0.08139,
+   "close_dist": 0.26566
+  },
+  {
+   "ticker": "HD",
+   "market": "US",
+   "week_low": 338.10999,
+   "lower": 256.38195,
+   "week_dist": 0.31877,
+   "qtd_dist": 0.081,
+   "close_dist": 0.41254
+  },
+  {
+   "ticker": "IP",
+   "market": "US",
+   "week_low": 28.42,
+   "lower": 26.8557,
+   "week_dist": 0.05825,
+   "qtd_dist": 0.05825,
+   "close_dist": 0.27682
+  },
+  {
+   "ticker": "INVH",
+   "market": "US",
+   "week_low": 26.005,
+   "lower": 24.75241,
+   "week_dist": 0.0506,
+   "qtd_dist": 0.0399,
+   "close_dist": 0.12514
+  },
+  {
+   "ticker": "JKHY",
+   "market": "US",
+   "week_low": 168.52,
+   "lower": 137.84305,
+   "week_dist": 0.22255,
+   "qtd_dist": 0.02827,
+   "close_dist": 0.3206
+  },
+  {
+   "ticker": "KMB",
+   "market": "US",
+   "week_low": 105.62,
+   "lower": 94.92291,
+   "week_dist": 0.11269,
+   "qtd_dist": -0.01025,
+   "close_dist": 0.14946
+  },
+  {
+   "ticker": "KHC",
+   "market": "US",
+   "week_low": 24.88,
+   "lower": 19.82109,
+   "week_dist": 0.25523,
+   "qtd_dist": 0.09782,
+   "close_dist": 0.33646
+  },
+  {
+   "ticker": "LOW",
+   "market": "US",
+   "week_low": 219.94,
+   "lower": 172.32935,
+   "week_dist": 0.27628,
+   "qtd_dist": 0.03552,
+   "close_dist": 0.37214
+  },
+  {
+   "ticker": "MKC",
+   "market": "US",
+   "week_low": 46.15,
+   "lower": 44.85654,
+   "week_dist": 0.02884,
+   "qtd_dist": -0.03581,
+   "close_dist": 0.10709
+  },
+  {
+   "ticker": "MCD",
+   "market": "US",
+   "week_low": 271.0,
+   "lower": 227.50391,
+   "week_dist": 0.19119,
+   "qtd_dist": 0.00746,
+   "close_dist": 0.24226
+  },
+  {
+   "ticker": "MGM",
+   "market": "US",
+   "week_low": 32.26,
+   "lower": 25.98953,
+   "week_dist": 0.24127,
+   "qtd_dist": 0.02772,
+   "close_dist": 0.35785
+  },
+  {
+   "ticker": "MAA",
+   "market": "US",
+   "week_low": 111.71,
+   "lower": 105.12757,
+   "week_dist": 0.06261,
+   "qtd_dist": 0.06261,
+   "close_dist": 0.11759
+  },
+  {
+   "ticker": "MDLZ",
+   "market": "US",
+   "week_low": 65.22,
+   "lower": 52.66256,
+   "week_dist": 0.23845,
+   "qtd_dist": 0.08844,
+   "close_dist": 0.28687
+  },
+  {
+   "ticker": "OTIS",
+   "market": "US",
+   "week_low": 75.34,
+   "lower": 61.07306,
+   "week_dist": 0.2336,
+   "qtd_dist": 0.04097,
+   "close_dist": 0.30172
+  },
+  {
+   "ticker": "PEP",
+   "market": "US",
+   "week_low": 138.14999,
+   "lower": 124.83646,
+   "week_dist": 0.10665,
+   "qtd_dist": -0.01095,
+   "close_dist": 0.15832
+  },
+  {
+   "ticker": "PPG",
+   "market": "US",
+   "week_low": 116.62,
+   "lower": 94.33896,
+   "week_dist": 0.23618,
+   "qtd_dist": 0.07803,
+   "close_dist": 0.32374
+  },
+  {
+   "ticker": "O",
+   "market": "US",
+   "week_low": 57.81,
+   "lower": 49.41909,
+   "week_dist": 0.16979,
+   "qtd_dist": 0.0755,
+   "close_dist": 0.22443
+  },
+  {
+   "ticker": "ROL",
+   "market": "US",
+   "week_low": 37.28,
+   "lower": 26.96922,
+   "week_dist": 0.38232,
+   "qtd_dist": 0.08605,
+   "close_dist": 0.42273
+  },
+  {
+   "ticker": "TSCO",
+   "market": "US",
+   "week_low": 37.28,
+   "lower": 30.66721,
+   "week_dist": 0.21563,
+   "qtd_dist": -0.02502,
+   "close_dist": 0.30465
+  },
+  {
+   "ticker": "UDR",
+   "market": "US",
+   "week_low": 35.25,
+   "lower": 30.16152,
+   "week_dist": 0.16871,
+   "qtd_dist": 0.09742,
+   "close_dist": 0.2191
+  },
+  {
+   "ticker": "VICI",
+   "market": "US",
+   "week_low": 23.86,
+   "lower": 24.24879,
+   "week_dist": -0.01603,
+   "qtd_dist": -0.07521,
+   "close_dist": 0.03593
+  },
+  {
+   "ticker": "WY",
+   "market": "US",
+   "week_low": 19.47,
+   "lower": 18.88874,
+   "week_dist": 0.03077,
+   "qtd_dist": -0.03329,
+   "close_dist": 0.10277
+  },
+  {
+   "ticker": "ZTS",
+   "market": "US",
+   "week_low": 78.8,
+   "lower": 75.68467,
+   "week_dist": 0.04116,
+   "qtd_dist": -0.09136,
+   "close_dist": 0.08939
+  },
+  {
+   "ticker": "AFI",
+   "market": "ASX",
+   "week_low": 6.65,
+   "lower": 6.52037,
+   "week_dist": 0.01988,
+   "qtd_dist": 0.00454,
+   "close_dist": 0.06589
+  },
+  {
+   "ticker": "AIA",
+   "market": "ASX",
+   "week_low": 7.29,
+   "lower": 6.21618,
+   "week_dist": 0.17275,
+   "qtd_dist": 0.04888,
+   "close_dist": 0.20653
+  },
+  {
+   "ticker": "AIZ",
+   "market": "ASX",
+   "week_low": 0.305,
+   "lower": 0.2841,
+   "week_dist": 0.07357,
+   "qtd_dist": 0.05597,
+   "close_dist": 0.09117
+  },
+  {
+   "ticker": "ALX",
+   "market": "ASX",
+   "week_low": 3.75,
+   "lower": 3.57865,
+   "week_dist": 0.04788,
+   "qtd_dist": 0.00038,
+   "close_dist": 0.10377
+  },
+  {
+   "ticker": "AMC",
+   "market": "ASX",
+   "week_low": 63.54,
+   "lower": 54.87184,
+   "week_dist": 0.15797,
+   "qtd_dist": 0.07797,
+   "close_dist": 0.23962
+  },
+  {
+   "ticker": "ARB",
+   "market": "ASX",
+   "week_low": 16.67,
+   "lower": 14.88928,
+   "week_dist": 0.1196,
+   "qtd_dist": 0.0887,
+   "close_dist": 0.15452
+  },
+  {
+   "ticker": "ARG",
+   "market": "ASX",
+   "week_low": 9.11,
+   "lower": 8.44046,
+   "week_dist": 0.07933,
+   "qtd_dist": 0.06748,
+   "close_dist": 0.10302
+  },
+  {
+   "ticker": "BPT",
+   "market": "ASX",
+   "week_low": 0.815,
+   "lower": 0.82396,
+   "week_dist": -0.01087,
+   "qtd_dist": -0.01087,
+   "close_dist": 0.06802
+  },
+  {
+   "ticker": "BWP",
+   "market": "ASX",
+   "week_low": 3.62,
+   "lower": 3.28251,
+   "week_dist": 0.10282,
+   "qtd_dist": 0.03427,
+   "close_dist": 0.15156
+  },
+  {
+   "ticker": "CEN",
+   "market": "ASX",
+   "week_low": 6.94,
+   "lower": 6.5335,
+   "week_dist": 0.06222,
+   "qtd_dist": 0.02089,
+   "close_dist": 0.06987
+  },
+  {
+   "ticker": "CIA",
+   "market": "ASX",
+   "week_low": 1.6125,
+   "lower": 2.42177,
+   "week_dist": -0.33416,
+   "qtd_dist": -0.33416,
+   "close_dist": -0.26706
+  },
+  {
+   "ticker": "CIP",
+   "market": "ASX",
+   "week_low": 2.875,
+   "lower": 2.52388,
+   "week_dist": 0.13912,
+   "qtd_dist": 0.06186,
+   "close_dist": 0.1728
+  },
+  {
+   "ticker": "CLW",
+   "market": "ASX",
+   "week_low": 3.48,
+   "lower": 2.93814,
+   "week_dist": 0.18442,
+   "qtd_dist": 0.05849,
+   "close_dist": 0.21505
+  },
+  {
+   "ticker": "CNU",
+   "market": "ASX",
+   "week_low": 6.575,
+   "lower": 6.28023,
+   "week_dist": 0.04694,
+   "qtd_dist": 0.00633,
+   "close_dist": 0.06684
+  },
+  {
+   "ticker": "COH",
+   "market": "ASX",
+   "week_low": 147.63,
+   "lower": 116.119,
+   "week_dist": 0.27137,
+   "qtd_dist": 0.07071,
+   "close_dist": 0.28764
+  },
+  {
+   "ticker": "CQR",
+   "market": "ASX",
+   "week_low": 3.82,
+   "lower": 3.13815,
+   "week_dist": 0.21728,
+   "qtd_dist": 0.06432,
+   "close_dist": 0.26826
+  },
+  {
+   "ticker": "CTD",
+   "market": "ASX",
+   "week_low": 3.25,
+   "lower": 5.67538,
+   "week_dist": -0.42735,
+   "qtd_dist": -0.61941,
+   "close_dist": -0.3322
+  },
+  {
+   "ticker": "CWY",
+   "market": "ASX",
+   "week_low": 3.01,
+   "lower": 2.24339,
+   "week_dist": 0.34172,
+   "qtd_dist": 0.07872,
+   "close_dist": 0.34172
+  },
+  {
+   "ticker": "DRR",
+   "market": "ASX",
+   "week_low": 3.53,
+   "lower": 3.36844,
+   "week_dist": 0.04796,
+   "qtd_dist": 0.04796,
+   "close_dist": 0.1489
+  },
+  {
+   "ticker": "EBO",
+   "market": "ASX",
+   "week_low": 17.21,
+   "lower": 14.80532,
+   "week_dist": 0.16242,
+   "qtd_dist": 0.00437,
+   "close_dist": 0.22118
+  },
+  {
+   "ticker": "FMG",
+   "market": "ASX",
+   "week_low": 13.23,
+   "lower": 12.86963,
+   "week_dist": 0.028,
+   "qtd_dist": 0.01868,
+   "close_dist": 0.09638
+  },
+  {
+   "ticker": "GNE",
+   "market": "ASX",
+   "week_low": 1.92,
+   "lower": 1.71632,
+   "week_dist": 0.11867,
+   "qtd_dist": 0.08663,
+   "close_dist": 0.1478
+  },
+  {
+   "ticker": "HDN",
+   "market": "ASX",
+   "week_low": 1.1625,
+   "lower": 1.05322,
+   "week_dist": 0.10376,
+   "qtd_dist": -0.04103,
+   "close_dist": 0.14412
+  },
+  {
+   "ticker": "LLC",
+   "market": "ASX",
+   "week_low": 1.445,
+   "lower": 1.65803,
+   "week_dist": -0.12848,
+   "qtd_dist": -0.12848,
+   "close_dist": -0.05008
+  },
+  {
+   "ticker": "MAQ",
+   "market": "ASX",
+   "week_low": 47.64,
+   "lower": 45.28987,
+   "week_dist": 0.05189,
+   "qtd_dist": -0.05034,
+   "close_dist": 0.11681
+  },
+  {
+   "ticker": "MCY",
+   "market": "ASX",
+   "week_low": 5.35,
+   "lower": 4.82623,
+   "week_dist": 0.10853,
+   "qtd_dist": 0.08988,
+   "close_dist": 0.17069
+  },
+  {
+   "ticker": "MEZ",
+   "market": "ASX",
+   "week_low": 4.42,
+   "lower": 4.1631,
+   "week_dist": 0.06171,
+   "qtd_dist": 0.02568,
+   "close_dist": 0.10495
+  },
+  {
+   "ticker": "MGR",
+   "market": "ASX",
+   "week_low": 1.84,
+   "lower": 1.67064,
+   "week_dist": 0.10137,
+   "qtd_dist": 0.05049,
+   "close_dist": 0.13729
+  },
+  {
+   "ticker": "MTS",
+   "market": "ASX",
+   "week_low": 3.27,
+   "lower": 2.72348,
+   "week_dist": 0.20067,
+   "qtd_dist": 0.04646,
+   "close_dist": 0.21169
+  },
+  {
+   "ticker": "MXT",
+   "market": "ASX",
+   "week_low": 1.505,
+   "lower": 1.72764,
+   "week_dist": -0.12887,
+   "qtd_dist": -0.12887,
+   "close_dist": -0.07388
+  },
+  {
+   "ticker": "NIC",
+   "market": "ASX",
+   "week_low": 0.535,
+   "lower": 0.53435,
+   "week_dist": 0.00121,
+   "qtd_dist": 0.00121,
+   "close_dist": 0.08543
+  },
+  {
+   "ticker": "NXT",
+   "market": "ASX",
+   "week_low": 8.74,
+   "lower": 7.23825,
+   "week_dist": 0.20747,
+   "qtd_dist": -0.29955,
+   "close_dist": 0.32076
+  },
+  {
+   "ticker": "OCL",
+   "market": "ASX",
+   "week_low": 5.5,
+   "lower": 6.18316,
+   "week_dist": -0.11049,
+   "qtd_dist": -0.12504,
+   "close_dist": -0.06197
+  },
+  {
+   "ticker": "ORA",
+   "market": "ASX",
+   "week_low": 1.55,
+   "lower": 1.19299,
+   "week_dist": 0.29926,
+   "qtd_dist": 0.07922,
+   "close_dist": 0.38727
+  },
+  {
+   "ticker": "PXA",
+   "market": "ASX",
+   "week_low": 6.41,
+   "lower": 7.44703,
+   "week_dist": -0.13925,
+   "qtd_dist": -0.17417,
+   "close_dist": -0.13254
+  },
+  {
+   "ticker": "SEK",
+   "market": "ASX",
+   "week_low": 12.35,
+   "lower": 11.64816,
+   "week_dist": 0.06025,
+   "qtd_dist": 0.01304,
+   "close_dist": 0.10404
+  },
+  {
+   "ticker": "SHL",
+   "market": "ASX",
+   "week_low": 21.48,
+   "lower": 17.22175,
+   "week_dist": 0.24726,
+   "qtd_dist": 0.05158,
+   "close_dist": 0.25191
+  },
+  {
+   "ticker": "SNZ",
+   "market": "ASX",
+   "week_low": 4.51,
+   "lower": 5.57915,
+   "week_dist": -0.19163,
+   "qtd_dist": -0.19163,
+   "close_dist": -0.11277
+  },
+  {
+   "ticker": "TCL",
+   "market": "ASX",
+   "week_low": 14.6,
+   "lower": 12.21352,
+   "week_dist": 0.1954,
+   "qtd_dist": 0.05457,
+   "close_dist": 0.24288
+  },
+  {
+   "ticker": "TPG",
+   "market": "ASX",
+   "week_low": 3.9,
+   "lower": 3.42575,
+   "week_dist": 0.13844,
+   "qtd_dist": 0.06838,
+   "close_dist": 0.15303
+  },
+  {
+   "ticker": "WAM",
+   "market": "ASX",
+   "week_low": 0.925,
+   "lower": 1.07578,
+   "week_dist": -0.14016,
+   "qtd_dist": -0.14016,
+   "close_dist": -0.13551
+  },
+  {
+   "ticker": "WLE",
+   "market": "ASX",
+   "week_low": 1.165,
+   "lower": 1.15263,
+   "week_dist": 0.01073,
+   "qtd_dist": 0.01073,
+   "close_dist": 0.03676
+  },
+  {
+   "ticker": "WOR",
+   "market": "ASX",
+   "week_low": 9.36,
+   "lower": 9.55702,
+   "week_dist": -0.02061,
+   "qtd_dist": -0.04782,
+   "close_dist": 0.0746
+  },
+  {
+   "ticker": "WPR",
+   "market": "ASX",
+   "week_low": 2.26,
+   "lower": 2.1158,
+   "week_dist": 0.06815,
+   "qtd_dist": -0.05237,
+   "close_dist": 0.09178
+  }
+ ]
+}
